@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import skin.support.SkinCompatManager;
@@ -20,7 +23,9 @@ import skin.support.widget.SkinCompatSupportable;
 public class SkinCompatDelegate implements LayoutInflater.Factory2 {
     private final Context mContext;
     private SkinCompatViewInflater mSkinCompatViewInflater;
-    private List<WeakReference<SkinCompatSupportable>> mSkinHelpers = new CopyOnWriteArrayList<>();
+
+    private final Set<WeakReference<SkinCompatSupportable>> mSkinHelpers =
+            Collections.newSetFromMap(new ConcurrentHashMap<>(100));;
 
     private SkinCompatDelegate(Context context) {
         mContext = context;
@@ -29,7 +34,6 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         View view = createView(parent, name, context, attrs);
-
         if (view == null) {
             return null;
         }
