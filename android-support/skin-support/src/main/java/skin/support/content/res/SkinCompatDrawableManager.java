@@ -47,7 +47,7 @@ import static skin.support.content.res.SkinCompatThemeUtils.getThemeAttrColorSta
 final class SkinCompatDrawableManager {
     private interface InflateDelegate {
         Drawable createFromXmlInner(@NonNull Context context, @NonNull XmlPullParser parser,
-                                    @NonNull AttributeSet attrs, @Nullable Resources.Theme theme);
+                @NonNull AttributeSet attrs, @Nullable Resources.Theme theme);
     }
 
     private static final String TAG = SkinCompatDrawableManager.class.getSimpleName();
@@ -150,7 +150,9 @@ final class SkinCompatDrawableManager {
      */
     private static final int[] TINT_CHECKABLE_BUTTON_LIST = {
             R.drawable.abc_btn_check_material,
-            R.drawable.abc_btn_radio_material
+            R.drawable.abc_btn_radio_material,
+            R.drawable.abc_btn_check_material_anim,
+            R.drawable.abc_btn_radio_material_anim
     };
 
     private WeakHashMap<Context, SparseArrayCompat<ColorStateList>> mTintLists;
@@ -163,17 +165,6 @@ final class SkinCompatDrawableManager {
     private TypedValue mTypedValue;
 
     private boolean mHasCheckedVectorDrawableSetup;
-
-    void clearCaches() {
-        mDrawableCaches.clear();
-        if (mKnownDrawableIdTags != null) {
-            mKnownDrawableIdTags.clear();
-        }
-        if (mTintLists != null) {
-            mTintLists.clear();
-        }
-        COLOR_FILTER_CACHE.evictAll();
-    }
 
     public synchronized Drawable getDrawable(@NonNull Context context, @DrawableRes int resId) {
         return getDrawable(context, resId, false);
