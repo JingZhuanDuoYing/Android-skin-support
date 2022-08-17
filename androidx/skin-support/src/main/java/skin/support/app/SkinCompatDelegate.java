@@ -79,12 +79,16 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
     }
 
     public void applySkin() {
-        if (mSkinHelpers != null && !mSkinHelpers.isEmpty()) {
+        if (!mSkinHelpers.isEmpty()) {
             for (WeakReference ref : mSkinHelpers) {
                 if (ref != null && ref.get() != null) {
                     ((SkinCompatSupportable) ref.get()).applySkin();
                 }
             }
         }
+    }
+
+    public Set<WeakReference<SkinCompatSupportable>> getSkinHelpers() {
+        return mSkinHelpers;
     }
 }
