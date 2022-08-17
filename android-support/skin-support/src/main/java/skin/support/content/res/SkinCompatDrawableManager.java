@@ -1,7 +1,6 @@
 package skin.support.content.res;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -12,23 +11,27 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.LongSparseArray;
-import android.support.v4.util.LruCache;
-import android.support.v7.appcompat.R;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.util.Xml;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.RestrictTo;
+import androidx.appcompat.R;
+import androidx.appcompat.graphics.drawable.AnimatedStateListDrawableCompat;
+import androidx.collection.ArrayMap;
+import androidx.collection.LongSparseArray;
+import androidx.collection.LruCache;
+import androidx.collection.SparseArrayCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -56,7 +59,10 @@ final class SkinCompatDrawableManager {
 
     private static SkinCompatDrawableManager INSTANCE;
 
-    public static SkinCompatDrawableManager get() {
+    /**
+     * Returns the singleton instance of this class.
+     */
+    public static synchronized SkinCompatDrawableManager get() {
         if (INSTANCE == null) {
             INSTANCE = new SkinCompatDrawableManager();
             installDefaultInflateDelegates(INSTANCE);
@@ -66,12 +72,12 @@ final class SkinCompatDrawableManager {
 
     private static void installDefaultInflateDelegates(@NonNull SkinCompatDrawableManager manager) {
         // This sdk version check will affect src:appCompat code path.
-        // Although VectorDrawable exists in Android framework from Lollipop, AppCompat will use the
-        // VectorDrawableCompat before Nougat to utilize the bug fixes in VectorDrawableCompat.
+        // Although VectorDrawable exists in Android framework from Lollipop, AppCompat will use
+        // (Animated)VectorDrawableCompat before Nougat to utilize bug fixes & feature backports.
         if (Build.VERSION.SDK_INT < 24) {
             manager.addDelegate("vector", new VdcInflateDelegate());
-            // AnimatedVectorDrawableCompat only works on API v11+
             manager.addDelegate("animated-vector", new AvdcInflateDelegate());
+            manager.addDelegate("animated-selector", new AsldcInflateDelegate());
         }
     }
 
@@ -120,7 +126,7 @@ final class SkinCompatDrawableManager {
 
     /**
      * Drawables which should be tinted with the value of {@code android.R.attr.colorBackground},
-     * using the {@link PorterDuff.Mode#MULTIPLY} mode and a color filter.
+     * using the {@link android.graphics.PorterDuff.Mode#MULTIPLY} mode and a color filter.
      */
     private static final int[] COLORFILTER_COLOR_BACKGROUND_MULTIPLY = {
             R.drawable.abc_popup_background_mtrl_mult,
@@ -147,12 +153,11 @@ final class SkinCompatDrawableManager {
             R.drawable.abc_btn_radio_material
     };
 
-    private WeakHashMap<Context, SparseArray<ColorStateList>> mTintLists;
+    private WeakHashMap<Context, SparseArrayCompat<ColorStateList>> mTintLists;
     private ArrayMap<String, InflateDelegate> mDelegates;
-    private SparseArray<String> mKnownDrawableIdTags;
+    private SparseArrayCompat<String> mKnownDrawableIdTags;
 
-    private final Object mDrawableCacheLock = new Object();
-    private final WeakHashMap<Context, LongSparseArray<WeakReference<ConstantState>>>
+    private final WeakHashMap<Context, LongSparseArray<WeakReference<Drawable.ConstantState>>>
             mDrawableCaches = new WeakHashMap<>(0);
 
     private TypedValue mTypedValue;
@@ -170,12 +175,12 @@ final class SkinCompatDrawableManager {
         COLOR_FILTER_CACHE.evictAll();
     }
 
-    public Drawable getDrawable(@NonNull Context context, @DrawableRes int resId) {
+    public synchronized Drawable getDrawable(@NonNull Context context, @DrawableRes int resId) {
         return getDrawable(context, resId, false);
     }
 
-    Drawable getDrawable(@NonNull Context context, @DrawableRes int resId,
-                         boolean failIfNotKnown) {
+    synchronized Drawable getDrawable(@NonNull Context context, @DrawableRes int resId,
+            boolean failIfNotKnown) {
         checkVectorDrawableSetup(context);
 
         Drawable drawable = loadDrawableFromDelegates(context, resId);
@@ -197,13 +202,11 @@ final class SkinCompatDrawableManager {
         return drawable;
     }
 
-    public void onConfigurationChanged(@NonNull Context context) {
-        synchronized (mDrawableCacheLock) {
-            LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
-            if (cache != null) {
-                // Crude, but we'll just clear the cache when the configuration changes
-                cache.clear();
-            }
+    public synchronized void onConfigurationChanged(@NonNull Context context) {
+        LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+        if (cache != null) {
+            // Crude, but we'll just clear the cache when the configuration changes
+            cache.clear();
         }
     }
 
@@ -212,7 +215,7 @@ final class SkinCompatDrawableManager {
     }
 
     private Drawable createDrawableIfNeeded(@NonNull Context context,
-                                            @DrawableRes final int resId) {
+            @DrawableRes final int resId) {
         if (mTypedValue == null) {
             mTypedValue = new TypedValue();
         }
@@ -244,7 +247,7 @@ final class SkinCompatDrawableManager {
     }
 
     private Drawable tintDrawable(@NonNull Context context, @DrawableRes int resId,
-                                  boolean failIfNotKnown, @NonNull Drawable drawable) {
+            boolean failIfNotKnown, @NonNull Drawable drawable) {
         final ColorStateList tintList = getTintList(context, resId);
         if (tintList != null) {
             // First mutate the Drawable, then wrap it and set the tint list
@@ -305,7 +308,7 @@ final class SkinCompatDrawableManager {
                 }
             } else {
                 // Create an id cache as we'll need one later
-                mKnownDrawableIdTags = new SparseArray<>();
+                mKnownDrawableIdTags = new SparseArrayCompat<>();
             }
 
             if (mTypedValue == null) {
@@ -347,7 +350,8 @@ final class SkinCompatDrawableManager {
                     // Now try and find a delegate for the tag name and inflate if found
                     final InflateDelegate delegate = mDelegates.get(tagName);
                     if (delegate != null) {
-                        dr = delegate.createFromXmlInner(context, parser, attrs, null);
+                        dr = delegate.createFromXmlInner(context, parser, attrs,
+                                context.getTheme());
                     }
                     if (dr != null) {
                         // Add it to the drawable cache
@@ -372,48 +376,56 @@ final class SkinCompatDrawableManager {
         return null;
     }
 
-    private Drawable getCachedDrawable(@NonNull final Context context, final long key) {
-        synchronized (mDrawableCacheLock) {
-            final LongSparseArray<WeakReference<ConstantState>> cache
-                    = mDrawableCaches.get(context);
-            if (cache == null) {
-                return null;
-            }
+    private synchronized Drawable getCachedDrawable(@NonNull final Context context,
+            final long key) {
+        final LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+        if (cache == null) {
+            return null;
+        }
 
-            final WeakReference<ConstantState> wr = cache.get(key);
-            if (wr != null) {
-                // We have the key, and the secret
-                ConstantState entry = wr.get();
-                if (entry != null) {
-                    return entry.newDrawable(context.getResources());
-                } else {
-                    // Our entry has been purged
-                    cache.delete(key);
-                }
+        final WeakReference<ConstantState> wr = cache.get(key);
+        if (wr != null) {
+            // We have the key, and the secret
+            ConstantState entry = wr.get();
+            if (entry != null) {
+                return entry.newDrawable(context.getResources());
+            } else {
+                // Our entry has been purged
+                cache.delete(key);
             }
         }
         return null;
     }
 
-    private boolean addDrawableToCache(@NonNull final Context context, final long key,
-                                       @NonNull final Drawable drawable) {
+    private synchronized boolean addDrawableToCache(@NonNull final Context context, final long key,
+            @NonNull final Drawable drawable) {
         final ConstantState cs = drawable.getConstantState();
         if (cs != null) {
-            synchronized (mDrawableCacheLock) {
-                LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
-                if (cache == null) {
-                    cache = new LongSparseArray<>();
-                    mDrawableCaches.put(context, cache);
-                }
-                cache.put(key, new WeakReference<ConstantState>(cs));
+            LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+            if (cache == null) {
+                cache = new LongSparseArray<>();
+                mDrawableCaches.put(context, cache);
             }
+            cache.put(key, new WeakReference<>(cs));
             return true;
         }
         return false;
     }
 
+    synchronized Drawable onDrawableLoadedFromResources(@NonNull Context context,
+            @NonNull VectorEnabledTintResources resources, @DrawableRes final int resId) {
+        Drawable drawable = loadDrawableFromDelegates(context, resId);
+        if (drawable == null) {
+            drawable = resources.superGetDrawable(resId);
+        }
+        if (drawable != null) {
+            return tintDrawable(context, resId, false, drawable);
+        }
+        return null;
+    }
+
     static boolean tintDrawableUsingColorFilter(@NonNull Context context,
-                                                @DrawableRes final int resId, @NonNull Drawable drawable) {
+            @DrawableRes final int resId, @NonNull Drawable drawable) {
         PorterDuff.Mode tintMode = DEFAULT_MODE;
         boolean colorAttrSet = false;
         int colorAttr = 0;
@@ -452,8 +464,8 @@ final class SkinCompatDrawableManager {
 
             if (DEBUG) {
                 Log.d(TAG, "[tintDrawableUsingColorFilter] Tinted "
-                        + context.getResources().getResourceName(resId) +
-                        " with color: #" + Integer.toHexString(color));
+                        + context.getResources().getResourceName(resId)
+                        + " with color: #" + Integer.toHexString(color));
             }
             return true;
         }
@@ -492,7 +504,7 @@ final class SkinCompatDrawableManager {
         return mode;
     }
 
-    ColorStateList getTintList(@NonNull Context context, @DrawableRes int resId) {
+    synchronized ColorStateList getTintList(@NonNull Context context, @DrawableRes int resId) {
         // Try the cache first (if it exists)
         ColorStateList tint = getTintListFromCache(context, resId);
 
@@ -532,7 +544,7 @@ final class SkinCompatDrawableManager {
 
     private ColorStateList getTintListFromCache(@NonNull Context context, @DrawableRes int resId) {
         if (mTintLists != null) {
-            final SparseArray<ColorStateList> tints = mTintLists.get(context);
+            final SparseArrayCompat<ColorStateList> tints = mTintLists.get(context);
             return tints != null ? tints.get(resId) : null;
         }
         return null;
@@ -543,9 +555,9 @@ final class SkinCompatDrawableManager {
         if (mTintLists == null) {
             mTintLists = new WeakHashMap<>();
         }
-        SparseArray<ColorStateList> themeTints = mTintLists.get(context);
+        SparseArrayCompat<ColorStateList> themeTints = mTintLists.get(context);
         if (themeTints == null) {
-            themeTints = new SparseArray<>();
+            themeTints = new SparseArrayCompat<>();
             mTintLists.put(context, themeTints);
         }
         themeTints.append(resId, tintList);
@@ -664,8 +676,31 @@ final class SkinCompatDrawableManager {
         }
     }
 
+    static void tintDrawable(Drawable drawable, TintInfo tint, int[] state) {
+        if (DrawableUtils.canSafelyMutateDrawable(drawable)
+                && drawable.mutate() != drawable) {
+            Log.d(TAG, "Mutated drawable is not the same instance as the input.");
+            return;
+        }
+
+        if (tint.mHasTintList || tint.mHasTintMode) {
+            drawable.setColorFilter(createTintFilter(
+                    tint.mHasTintList ? tint.mTintList : null,
+                    tint.mHasTintMode ? tint.mTintMode : DEFAULT_MODE,
+                    state));
+        } else {
+            drawable.clearColorFilter();
+        }
+
+        if (Build.VERSION.SDK_INT <= 23) {
+            // Pre-v23 there is no guarantee that a state change will invoke an invalidation,
+            // so we force it ourselves
+            drawable.invalidateSelf();
+        }
+    }
+
     private static PorterDuffColorFilter createTintFilter(ColorStateList tint,
-                                                          PorterDuff.Mode tintMode, final int[] state) {
+            PorterDuff.Mode tintMode, final int[] state) {
         if (tint == null || tintMode == null) {
             return null;
         }
@@ -673,8 +708,9 @@ final class SkinCompatDrawableManager {
         return getPorterDuffColorFilter(color, tintMode);
     }
 
-    public static PorterDuffColorFilter getPorterDuffColorFilter(int color, PorterDuff.Mode mode) {
-        // First, lets see if the cache already contains the color filter
+    public static synchronized PorterDuffColorFilter getPorterDuffColorFilter(
+            int color, PorterDuff.Mode mode) {
+        // First, let's see if the cache already contains the color filter
         PorterDuffColorFilter filter = COLOR_FILTER_CACHE.get(color, mode);
 
         if (filter == null) {
@@ -718,7 +754,6 @@ final class SkinCompatDrawableManager {
         VdcInflateDelegate() {
         }
 
-        @SuppressLint("NewApi")
         @Override
         public Drawable createFromXmlInner(@NonNull Context context, @NonNull XmlPullParser parser,
                                            @NonNull AttributeSet attrs, @Nullable Resources.Theme theme) {
@@ -732,13 +767,10 @@ final class SkinCompatDrawableManager {
         }
     }
 
-    @RequiresApi(11)
-    @TargetApi(11)
     private static class AvdcInflateDelegate implements InflateDelegate {
         AvdcInflateDelegate() {
         }
 
-        @SuppressLint("NewApi")
         @Override
         public Drawable createFromXmlInner(@NonNull Context context, @NonNull XmlPullParser parser,
                                            @NonNull AttributeSet attrs, @Nullable Resources.Theme theme) {
@@ -747,6 +779,21 @@ final class SkinCompatDrawableManager {
                         .createFromXmlInner(context, context.getResources(), parser, attrs, theme);
             } catch (Exception e) {
                 Log.e("AvdcInflateDelegate", "Exception while inflating <animated-vector>", e);
+                return null;
+            }
+        }
+    }
+
+    @RequiresApi(11)
+    static class AsldcInflateDelegate implements InflateDelegate {
+        @Override
+        public Drawable createFromXmlInner(@NonNull Context context, @NonNull XmlPullParser parser,
+                @NonNull AttributeSet attrs, @Nullable Resources.Theme theme) {
+            try {
+                return AnimatedStateListDrawableCompat
+                        .createFromXmlInner(context, context.getResources(), parser, attrs, theme);
+            } catch (Exception e) {
+                Log.e("AsldcInflateDelegate", "Exception while inflating <animated-selector>", e);
                 return null;
             }
         }
