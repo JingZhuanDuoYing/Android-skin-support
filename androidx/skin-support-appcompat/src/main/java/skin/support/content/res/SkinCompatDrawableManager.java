@@ -117,13 +117,7 @@ final class SkinCompatDrawableManager {
             R.drawable.abc_textfield_activated_mtrl_alpha,
             R.drawable.abc_textfield_search_activated_mtrl_alpha,
             R.drawable.abc_cab_background_top_mtrl_alpha,
-            R.drawable.abc_text_cursor_material,
-            R.drawable.abc_text_select_handle_left_mtrl_dark,
-            R.drawable.abc_text_select_handle_middle_mtrl_dark,
-            R.drawable.abc_text_select_handle_right_mtrl_dark,
-            R.drawable.abc_text_select_handle_left_mtrl_light,
-            R.drawable.abc_text_select_handle_middle_mtrl_light,
-            R.drawable.abc_text_select_handle_right_mtrl_light
+            R.drawable.abc_text_cursor_material
     };
 
     /**
