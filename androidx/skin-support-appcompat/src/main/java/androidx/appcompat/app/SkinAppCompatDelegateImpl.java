@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 
 public class SkinAppCompatDelegateImpl extends AppCompatDelegateImpl {
     private static Map<Activity, WeakReference<AppCompatDelegate>> sDelegateMap = new WeakHashMap<>();
+    private final Context mContext;
 
     public static AppCompatDelegate get(Activity activity, AppCompatCallback callback) {
         WeakReference<AppCompatDelegate> delegateRef = sDelegateMap.get(activity);
@@ -23,9 +24,18 @@ public class SkinAppCompatDelegateImpl extends AppCompatDelegateImpl {
 
     private SkinAppCompatDelegateImpl(Context context, Window window, AppCompatCallback callback) {
         super(context, window, callback);
+        this.mContext = context;
     }
 
     @Override
     public void installViewFactory() {
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mContext != null && mContext instanceof Activity) {
+            sDelegateMap.remove(mContext);
+        }
+        super.onDestroy();
     }
 }
