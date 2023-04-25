@@ -6,8 +6,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
     }
     buildTypes {
         release {
@@ -20,6 +18,7 @@ android {
             res.srcDirs = ['src/main/res', 'src/main/res-alertdialog']
         }
     }
+    namespace 'skin.support.appcompat'
 }
 
 dependencies {

@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 32
-    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "skin.support.mobile.demo"
@@ -35,6 +34,7 @@ android {
                            'src/main/res-yellow']
         }
     }
+    namespace 'skin.support.mobile.demo'
 }
 
 dependencies {

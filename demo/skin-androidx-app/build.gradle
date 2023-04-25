@@ -21,6 +21,7 @@ android {
             res.srcDirs = ['src/main/res', 'src/main/res-night']
         }
     }
+    namespace 'com.ximsfei.skindemo'
 }
 
 dependencies {
