@@ -62,16 +62,16 @@ public class MainActivity extends BaseActivity {
         mMenuBnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.bnv_home:
-                        mContainerVp.setCurrentItem(0);
-                        return true;
-                    case R.id.bnv_discovery:
-                        mContainerVp.setCurrentItem(1);
-                        return true;
-                    case R.id.bnv_mine:
-                        mContainerVp.setCurrentItem(2);
-                        return true;
+                int itemId = item.getItemId();
+                if (itemId == R.id.bnv_home) {
+                    mContainerVp.setCurrentItem(0);
+                    return true;
+                } else if (itemId == R.id.bnv_discovery) {
+                    mContainerVp.setCurrentItem(1);
+                    return true;
+                } else if (itemId == R.id.bnv_mine) {
+                    mContainerVp.setCurrentItem(2);
+                    return true;
                 }
                 return false;
             }

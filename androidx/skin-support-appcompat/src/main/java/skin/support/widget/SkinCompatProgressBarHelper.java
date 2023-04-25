@@ -17,7 +17,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.ProgressBar;
 
-import skin.support.appcompat.R;
+import skin.support.R;
 import skin.support.content.res.SkinCompatResources;
 import skin.support.content.res.SkinCompatVectorResources;
 import skin.support.utils.SkinCompatVersionUtils;

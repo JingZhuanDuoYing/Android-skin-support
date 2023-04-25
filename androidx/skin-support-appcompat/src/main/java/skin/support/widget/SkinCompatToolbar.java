@@ -7,9 +7,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import android.util.AttributeSet;
 
-import skin.support.appcompat.R;
 import skin.support.content.res.SkinCompatResources;
 import skin.support.content.res.SkinCompatVectorResources;
+
+import skin.support.R;
 
 import static skin.support.widget.SkinCompatHelper.INVALID_ID;
 
@@ -28,7 +29,7 @@ public class SkinCompatToolbar extends Toolbar implements SkinCompatSupportable 
     }
 
     public SkinCompatToolbar(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, R.attr.toolbarStyle);
+        this(context, attrs, androidx.appcompat.R.attr.toolbarStyle);
     }
 
     public SkinCompatToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -36,15 +37,15 @@ public class SkinCompatToolbar extends Toolbar implements SkinCompatSupportable 
         mBackgroundTintHelper = new SkinCompatBackgroundHelper(this);
         mBackgroundTintHelper.loadFromAttributes(attrs, defStyleAttr);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Toolbar, defStyleAttr, 0);
-        mNavigationIconResId = a.getResourceId(R.styleable.Toolbar_navigationIcon, INVALID_ID);
+        TypedArray a = context.obtainStyledAttributes(attrs, androidx.appcompat.R.styleable.Toolbar, defStyleAttr, 0);
+        mNavigationIconResId = a.getResourceId(androidx.appcompat.R.styleable.Toolbar_navigationIcon, INVALID_ID);
 
-        int titleAp = a.getResourceId(R.styleable.Toolbar_titleTextAppearance, INVALID_ID);
-        int subtitleAp = a.getResourceId(R.styleable.Toolbar_subtitleTextAppearance, INVALID_ID);
+        int titleAp = a.getResourceId(androidx.appcompat.R.styleable.Toolbar_titleTextAppearance, INVALID_ID);
+        int subtitleAp = a.getResourceId(androidx.appcompat.R.styleable.Toolbar_subtitleTextAppearance, INVALID_ID);
         a.recycle();
         if (titleAp != INVALID_ID) {
-            a = context.obtainStyledAttributes(titleAp, R.styleable.SkinTextAppearance);
-            mTitleTextColorResId = a.getResourceId(R.styleable.SkinTextAppearance_android_textColor, INVALID_ID);
+            a = context.obtainStyledAttributes(titleAp, skin.support.R.styleable.SkinTextAppearance);
+            mTitleTextColorResId = a.getResourceId(skin.support.R.styleable.SkinTextAppearance_android_textColor, INVALID_ID);
             a.recycle();
         }
         if (subtitleAp != INVALID_ID) {
@@ -52,12 +53,12 @@ public class SkinCompatToolbar extends Toolbar implements SkinCompatSupportable 
             mSubtitleTextColorResId = a.getResourceId(R.styleable.SkinTextAppearance_android_textColor, INVALID_ID);
             a.recycle();
         }
-        a = context.obtainStyledAttributes(attrs, R.styleable.Toolbar, defStyleAttr, 0);
-        if (a.hasValue(R.styleable.Toolbar_titleTextColor)) {
-            mTitleTextColorResId = a.getResourceId(R.styleable.Toolbar_titleTextColor, INVALID_ID);
+        a = context.obtainStyledAttributes(attrs, androidx.appcompat.R.styleable.Toolbar, defStyleAttr, 0);
+        if (a.hasValue(androidx.appcompat.R.styleable.Toolbar_titleTextColor)) {
+            mTitleTextColorResId = a.getResourceId(androidx.appcompat.R.styleable.Toolbar_titleTextColor, INVALID_ID);
         }
-        if (a.hasValue(R.styleable.Toolbar_subtitleTextColor)) {
-            mSubtitleTextColorResId = a.getResourceId(R.styleable.Toolbar_subtitleTextColor, INVALID_ID);
+        if (a.hasValue(androidx.appcompat.R.styleable.Toolbar_subtitleTextColor)) {
+            mSubtitleTextColorResId = a.getResourceId(androidx.appcompat.R.styleable.Toolbar_subtitleTextColor, INVALID_ID);
         }
         a.recycle();
         applyTitleTextColor();

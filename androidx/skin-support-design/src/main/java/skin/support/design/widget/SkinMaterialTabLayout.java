@@ -6,7 +6,7 @@ import com.google.android.material.tabs.TabLayout;
 import android.util.AttributeSet;
 
 import skin.support.content.res.SkinCompatResources;
-import skin.support.design.R;
+import com.google.android.material.R;
 import skin.support.widget.SkinCompatHelper;
 import skin.support.widget.SkinCompatSupportable;
 
@@ -39,9 +39,9 @@ public class SkinMaterialTabLayout extends TabLayout implements SkinCompatSuppor
         int tabTextAppearance = a.getResourceId(R.styleable.TabLayout_tabTextAppearance, R.style.TextAppearance_Design_Tab);
 
         // Text colors/sizes come from the text appearance first
-        final TypedArray ta = context.obtainStyledAttributes(tabTextAppearance, R.styleable.SkinTextAppearance);
+        final TypedArray ta = context.obtainStyledAttributes(tabTextAppearance, skin.support.R.styleable.SkinTextAppearance);
         try {
-            mTabTextColorsResId = ta.getResourceId(R.styleable.SkinTextAppearance_android_textColor, INVALID_ID);
+            mTabTextColorsResId = ta.getResourceId(skin.support.R.styleable.SkinTextAppearance_android_textColor, INVALID_ID);
         } finally {
             ta.recycle();
         }

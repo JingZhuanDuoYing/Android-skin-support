@@ -10,7 +10,7 @@ import com.flyco.tablayout.SegmentTabLayout;
 import java.lang.reflect.Field;
 
 import skin.support.content.res.SkinCompatResources;
-import skin.support.flycotablayout.R;
+import com.flyco.tablayout.R;
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatHelper;
 import skin.support.widget.SkinCompatSupportable;

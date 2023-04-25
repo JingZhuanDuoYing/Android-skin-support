@@ -4,7 +4,7 @@ import android.content.Context;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 
 /**
  * Created by ximsfei on 17-1-21.

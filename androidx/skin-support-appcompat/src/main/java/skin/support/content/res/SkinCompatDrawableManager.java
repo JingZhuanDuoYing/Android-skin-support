@@ -44,7 +44,7 @@ import static skin.support.content.res.SkinCompatThemeUtils.getDisabledThemeAttr
 import static skin.support.content.res.SkinCompatThemeUtils.getThemeAttrColor;
 import static skin.support.content.res.SkinCompatThemeUtils.getThemeAttrColorStateList;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 
 final class SkinCompatDrawableManager {
     private interface InflateDelegate {
@@ -723,7 +723,7 @@ final class SkinCompatDrawableManager {
         // Here we will check that a known Vector drawable resource inside AppCompat can be
         // correctly decoded
         mHasCheckedVectorDrawableSetup = true;
-        final Drawable d = getDrawable(context, R.drawable.abc_vector_test);
+        final Drawable d = getDrawable(context, androidx.appcompat.resources.R.drawable.abc_vector_test);
         if (d == null || !isVectorDrawable(d)) {
             mHasCheckedVectorDrawableSetup = false;
             throw new IllegalStateException("This app has been built with an incorrect "

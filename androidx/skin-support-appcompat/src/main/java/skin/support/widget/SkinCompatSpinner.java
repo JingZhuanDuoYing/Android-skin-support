@@ -9,7 +9,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 import skin.support.content.res.SkinCompatVectorResources;
 
 import static skin.support.widget.SkinCompatHelper.INVALID_ID;

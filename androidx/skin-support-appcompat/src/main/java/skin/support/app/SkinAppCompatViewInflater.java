@@ -14,7 +14,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewParent;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 import skin.support.content.res.SkinCompatVectorResources;
 import skin.support.utils.Slog;
 import skin.support.widget.SkinCompatAutoCompleteTextView;
@@ -130,12 +130,8 @@ public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrappe
 
     private View createViewFromV7(Context context, String name, AttributeSet attrs) {
         View view = null;
-        switch (name) {
-            case "androidx.appcompat.widget.Toolbar":
-                view = new SkinCompatToolbar(context, attrs);
-                break;
-            default:
-                break;
+        if ("androidx.appcompat.widget.Toolbar".equals(name)) {
+            view = new SkinCompatToolbar(context, attrs);
         }
         return view;
     }

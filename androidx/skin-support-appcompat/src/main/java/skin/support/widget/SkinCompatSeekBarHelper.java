@@ -4,7 +4,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.SeekBar;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 import skin.support.content.res.SkinCompatResources;
 import skin.support.content.res.SkinCompatVectorResources;
 

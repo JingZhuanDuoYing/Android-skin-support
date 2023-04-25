@@ -7,7 +7,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import android.util.AttributeSet;
 
 import skin.support.content.res.SkinCompatVectorResources;
-import skin.support.design.R;
+import com.google.android.material.R;
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatHelper;
 import skin.support.widget.SkinCompatSupportable;

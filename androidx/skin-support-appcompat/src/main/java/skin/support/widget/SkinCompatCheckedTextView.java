@@ -6,7 +6,7 @@ import androidx.annotation.DrawableRes;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 import android.util.AttributeSet;
 
-import skin.support.appcompat.R;
+import androidx.appcompat.R;
 import skin.support.content.res.SkinCompatVectorResources;
 
 import static skin.support.widget.SkinCompatHelper.INVALID_ID;

@@ -15,7 +15,7 @@ public class SkinApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Slog.DEBUG = BuildConfig.DEBUG;
+        Slog.DEBUG = true;
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         SkinCompatManager.withoutActivity(this)
 //                .addStrategy(new CustomSDCardLoader())          // 自定义加载策略，指定SDCard路径

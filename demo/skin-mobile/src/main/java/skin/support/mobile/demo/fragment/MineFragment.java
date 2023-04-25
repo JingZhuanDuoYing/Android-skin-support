@@ -86,55 +86,43 @@ public class MineFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.wli_about:
-                startActivity(new Intent(getContext(), AboutActivity.class));
-                break;
-            case R.id.wli_color_picker:
-                startActivity(new Intent(getContext(), ColorPickerActivity.class));
-                break;
+        int id = v.getId();
+        if (id == R.id.wli_about) {
+            startActivity(new Intent(getContext(), AboutActivity.class));
+        } else if (id == R.id.wli_color_picker) {
+            startActivity(new Intent(getContext(), ColorPickerActivity.class));
         }
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         Slog.i("MineFragment", "checkId: " + checkedId);
-        switch (checkedId) {
-            case R.id.rb_skin_default:
-                SkinCompatManager.getInstance().restoreDefaultTheme();
-                break;
-            case R.id.rb_skin_yellow:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.YELLOW, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_red:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.RED, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_pink:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.PINK, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_black:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.BLACK, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_white:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.WHITE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_blue:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.BLUE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_green:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.GREEN, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
-            case R.id.rb_skin_orange:
-                SkinCompatManager.getInstance()
-                        .loadSkin(Constants.SKIN_NAME.ORANGE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
-                break;
+        if (checkedId == R.id.rb_skin_default) {
+            SkinCompatManager.getInstance().restoreDefaultTheme();
+        } else if (checkedId == R.id.rb_skin_yellow) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.YELLOW, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_red) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.RED, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_pink) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.PINK, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_black) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.BLACK, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_white) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.WHITE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_blue) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.BLUE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_green) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.GREEN, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+        } else if (checkedId == R.id.rb_skin_orange) {
+            SkinCompatManager.getInstance()
+                    .loadSkin(Constants.SKIN_NAME.ORANGE, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
         }
     }
 }

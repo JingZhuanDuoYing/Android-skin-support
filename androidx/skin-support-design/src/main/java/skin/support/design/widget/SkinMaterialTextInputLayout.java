@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import skin.support.content.res.SkinCompatResources;
-import skin.support.design.R;
+import com.google.android.material.R;
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatEditText;
 import skin.support.widget.SkinCompatHelper;

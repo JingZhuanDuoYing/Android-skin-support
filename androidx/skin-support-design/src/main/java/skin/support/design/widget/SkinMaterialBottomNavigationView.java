@@ -6,12 +6,27 @@ import android.content.res.TypedArray;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.TintTypedArray;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import skin.support.content.res.SkinCompatResources;
-import skin.support.design.R;
+import com.google.android.material.R;
+import com.google.android.material.internal.ThemeEnforcement;
+import com.google.android.material.internal.ViewUtils;
+import com.google.android.material.shape.MaterialShapeDrawable;
+
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatHelper;
 import skin.support.widget.SkinCompatSupportable;
@@ -40,27 +55,73 @@ public class SkinMaterialBottomNavigationView extends BottomNavigationView imple
         this(context, attrs, 0);
     }
 
-    public SkinMaterialBottomNavigationView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        mBackgroundTintHelper = new SkinCompatBackgroundHelper(this);
-        mBackgroundTintHelper.loadFromAttributes(attrs, defStyleAttr);
+    public SkinMaterialBottomNavigationView(
+            @NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, R.style.Widget_Design_BottomNavigationView);
+    }
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationView, defStyleAttr,
-                R.style.Widget_Design_BottomNavigationView);
+    public SkinMaterialBottomNavigationView(
+            @NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
 
-        if (a.hasValue(R.styleable.BottomNavigationView_itemIconTint)) {
-            mIconTintResId = a.getResourceId(R.styleable.BottomNavigationView_itemIconTint, INVALID_ID);
-        } else {
-            mDefaultTintResId = resolveColorPrimary();
+        // Ensure we are using the correctly themed context rather than the context that was passed in.
+        context = getContext();
+
+        /* Custom attributes */
+        TintTypedArray attributes =
+                ThemeEnforcement.obtainTintedStyledAttributes(
+                        context, attrs, R.styleable.BottomNavigationView, defStyleAttr, defStyleRes);
+
+        setItemHorizontalTranslationEnabled(
+                attributes.getBoolean(
+                        R.styleable.BottomNavigationView_itemHorizontalTranslationEnabled, true));
+
+        if (attributes.hasValue(R.styleable.BottomNavigationView_android_minHeight)) {
+            setMinimumHeight(
+                    attributes.getDimensionPixelSize(R.styleable.BottomNavigationView_android_minHeight, 0));
         }
-        if (a.hasValue(R.styleable.BottomNavigationView_itemTextColor)) {
-            mTextColorResId = a.getResourceId(R.styleable.BottomNavigationView_itemTextColor, INVALID_ID);
-        } else {
-            mDefaultTintResId = resolveColorPrimary();
+
+        attributes.recycle();
+
+        if (shouldDrawCompatibilityTopDivider()) {
+            addCompatibilityTopDivider(context);
         }
-        a.recycle();
-        applyItemIconTintResource();
-        applyItemTextColorResource();
+
+        applyWindowInsets();
+    }
+
+    private boolean shouldDrawCompatibilityTopDivider() {
+        return Build.VERSION.SDK_INT < 21 && !(getBackground() instanceof MaterialShapeDrawable);
+    }
+
+    private void addCompatibilityTopDivider(@NonNull Context context) {
+        View divider = new View(context);
+        divider.setBackgroundColor(
+                ContextCompat.getColor(context, R.color.design_bottom_navigation_shadow_color));
+        FrameLayout.LayoutParams dividerParams =
+                new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        getResources().getDimensionPixelSize(R.dimen.design_bottom_navigation_shadow_height));
+        divider.setLayoutParams(dividerParams);
+        addView(divider);
+    }
+
+    private void applyWindowInsets() {
+        ViewUtils.doOnApplyWindowInsets(
+                this,
+                (view, insets, initialPadding) -> {
+                    // Apply the bottom, start, and end padding for a BottomNavigationView
+                    // to dodge the system navigation bar
+                    initialPadding.bottom += insets.getSystemWindowInsetBottom();
+
+                    boolean isRtl = ViewCompat.getLayoutDirection(view) == ViewCompat.LAYOUT_DIRECTION_RTL;
+                    int systemWindowInsetLeft = insets.getSystemWindowInsetLeft();
+                    int systemWindowInsetRight = insets.getSystemWindowInsetRight();
+                    initialPadding.start += isRtl ? systemWindowInsetRight : systemWindowInsetLeft;
+                    initialPadding.end += isRtl ? systemWindowInsetLeft : systemWindowInsetRight;
+                    initialPadding.applyToView(view);
+                    return insets;
+                });
     }
 
     @Override

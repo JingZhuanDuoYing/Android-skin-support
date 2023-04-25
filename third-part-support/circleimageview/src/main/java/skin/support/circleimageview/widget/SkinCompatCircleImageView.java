@@ -36,9 +36,9 @@ public class SkinCompatCircleImageView extends CircleImageView implements SkinCo
         mImageHelper = new SkinCompatImageHelper(this);
         mImageHelper.loadFromAttributes(attrs, defStyle);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, defStyle, 0);
-        mBorderColorResId = a.getResourceId(R.styleable.CircleImageView_civ_border_color, INVALID_ID);
-        mFillColorResId = a.getResourceId(R.styleable.CircleImageView_civ_fill_color, INVALID_ID);
+        TypedArray a = context.obtainStyledAttributes(attrs, de.hdodenhof.circleimageview.R.styleable.CircleImageView, defStyle, 0);
+        mBorderColorResId = a.getResourceId(de.hdodenhof.circleimageview.R.styleable.CircleImageView_civ_border_color, INVALID_ID);
+        mFillColorResId = a.getResourceId(de.hdodenhof.circleimageview.R.styleable.CircleImageView_civ_fill_color, INVALID_ID);
         a.recycle();
         applyBorderColorResource();
         applyFillColorResource();

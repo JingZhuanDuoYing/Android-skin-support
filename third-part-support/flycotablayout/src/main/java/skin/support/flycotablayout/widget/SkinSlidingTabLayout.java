@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import com.flyco.tablayout.SlidingTabLayout;
 
 import skin.support.content.res.SkinCompatResources;
-import skin.support.flycotablayout.R;
+import com.flyco.tablayout.R;
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatHelper;
 import skin.support.widget.SkinCompatSupportable;

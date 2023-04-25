@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import skin.support.SkinCompatManager;
 import skin.support.annotation.NonNull;
@@ -80,9 +79,9 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
 
     public void applySkin() {
         if (!mSkinHelpers.isEmpty()) {
-            for (WeakReference ref : mSkinHelpers) {
+            for (WeakReference<SkinCompatSupportable> ref : mSkinHelpers) {
                 if (ref != null && ref.get() != null) {
-                    ((SkinCompatSupportable) ref.get()).applySkin();
+                    ref.get().applySkin();
                 }
             }
         }
