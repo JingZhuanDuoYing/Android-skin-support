@@ -176,7 +176,7 @@ public class SkinCompatViewInflater {
         return view;
     }
 
-    public View createViewFromTag(Context context, String name, AttributeSet attrs) {
+    private View createViewFromTag(Context context, String name, AttributeSet attrs) {
         if (name.equals("view")) {
             name = attrs.getAttributeValue(null, "class");
         }
@@ -187,14 +187,14 @@ public class SkinCompatViewInflater {
 
             if (-1 == name.indexOf('.')) {
                 for (int i = 0; i < sClassPrefixList.length; i++) {
-                    final View view = createView(context, name, sClassPrefixList[i]);
+                    final View view = createViewByPrefix(context, name, sClassPrefixList[i]);
                     if (view != null) {
                         return view;
                     }
                 }
                 return null;
             } else {
-                return createView(context, name, null);
+                return createViewByPrefix(context, name, null);
             }
         } catch (Exception e) {
             // We do not want to catch these, lets return null and let the actual LayoutInflater
@@ -204,6 +204,30 @@ public class SkinCompatViewInflater {
             // Don't retain references on context.
             mConstructorArgs[0] = null;
             mConstructorArgs[1] = null;
+        }
+    }
+
+    private View createViewByPrefix(Context context, String name, String prefix)
+            throws ClassNotFoundException, InflateException {
+        Constructor<? extends View> constructor = sConstructorMap.get(name);
+
+        try {
+            if (constructor == null) {
+                // Class not found in the cache, see if it's real, and try to add it
+                Class<? extends View> clazz = Class.forName(
+                        prefix != null ? (prefix + name) : name,
+                        false,
+                        context.getClassLoader()).asSubclass(View.class);
+
+                constructor = clazz.getConstructor(sConstructorSignature);
+                sConstructorMap.put(name, constructor);
+            }
+            constructor.setAccessible(true);
+            return constructor.newInstance(mConstructorArgs);
+        } catch (Exception e) {
+            // We do not want to catch these, lets return null and let the actual LayoutInflater
+            // try
+            return null;
         }
     }
 
@@ -229,28 +253,6 @@ public class SkinCompatViewInflater {
             view.setOnClickListener(new DeclaredOnClickListener(view, handlerName));
         }
         a.recycle();
-    }
-
-    private View createView(Context context, String name, String prefix)
-            throws ClassNotFoundException, InflateException {
-        Constructor<? extends View> constructor = sConstructorMap.get(name);
-
-        try {
-            if (constructor == null) {
-                // Class not found in the cache, see if it's real, and try to add it
-                Class<? extends View> clazz = context.getClassLoader().loadClass(
-                        prefix != null ? (prefix + name) : name).asSubclass(View.class);
-
-                constructor = clazz.getConstructor(sConstructorSignature);
-                sConstructorMap.put(name, constructor);
-            }
-            constructor.setAccessible(true);
-            return constructor.newInstance(mConstructorArgs);
-        } catch (Exception e) {
-            // We do not want to catch these, lets return null and let the actual LayoutInflater
-            // try
-            return null;
-        }
     }
 
     /**
@@ -303,7 +305,7 @@ public class SkinCompatViewInflater {
         @Override
         public void onClick(@NonNull View v) {
             if (mResolvedMethod == null) {
-                resolveMethod(mHostView.getContext(), mMethodName);
+                resolveMethod(mHostView.getContext());
             }
 
             try {
@@ -317,8 +319,7 @@ public class SkinCompatViewInflater {
             }
         }
 
-        @NonNull
-        private void resolveMethod(@Nullable Context context, @NonNull String name) {
+        private void resolveMethod(@Nullable Context context) {
             while (context != null) {
                 try {
                     if (!context.isRestricted()) {

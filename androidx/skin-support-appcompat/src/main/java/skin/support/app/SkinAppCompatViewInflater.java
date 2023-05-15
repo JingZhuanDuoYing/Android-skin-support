@@ -62,68 +62,28 @@ public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrappe
             return null;
         }
         switch (name) {
-            case "View":
-                view = new SkinCompatView(context, attrs);
-                break;
-            case "LinearLayout":
-                view = new SkinCompatLinearLayout(context, attrs);
-                break;
-            case "RelativeLayout":
-                view = new SkinCompatRelativeLayout(context, attrs);
-                break;
-            case "FrameLayout":
-                view = new SkinCompatFrameLayout(context, attrs);
-                break;
-            case "TextView":
-                view = new SkinCompatTextView(context, attrs);
-                break;
-            case "ImageView":
-                view = new SkinCompatImageView(context, attrs);
-                break;
-            case "Button":
-                view = new SkinCompatButton(context, attrs);
-                break;
-            case "EditText":
-                view = new SkinCompatEditText(context, attrs);
-                break;
-            case "Spinner":
-                view = new SkinCompatSpinner(context, attrs);
-                break;
-            case "ImageButton":
-                view = new SkinCompatImageButton(context, attrs);
-                break;
-            case "CheckBox":
-                view = new SkinCompatCheckBox(context, attrs);
-                break;
-            case "RadioButton":
-                view = new SkinCompatRadioButton(context, attrs);
-                break;
-            case "RadioGroup":
-                view = new SkinCompatRadioGroup(context, attrs);
-                break;
-            case "CheckedTextView":
-                view = new SkinCompatCheckedTextView(context, attrs);
-                break;
-            case "AutoCompleteTextView":
-                view = new SkinCompatAutoCompleteTextView(context, attrs);
-                break;
-            case "MultiAutoCompleteTextView":
-                view = new SkinCompatMultiAutoCompleteTextView(context, attrs);
-                break;
-            case "RatingBar":
-                view = new SkinCompatRatingBar(context, attrs);
-                break;
-            case "SeekBar":
-                view = new SkinCompatSeekBar(context, attrs);
-                break;
-            case "ProgressBar":
-                view = new SkinCompatProgressBar(context, attrs);
-                break;
-            case "ScrollView":
-                view = new SkinCompatScrollView(context, attrs);
-                break;
-            default:
-                break;
+            case "View" -> view = new SkinCompatView(context, attrs);
+            case "LinearLayout" -> view = new SkinCompatLinearLayout(context, attrs);
+            case "RelativeLayout" -> view = new SkinCompatRelativeLayout(context, attrs);
+            case "FrameLayout" -> view = new SkinCompatFrameLayout(context, attrs);
+            case "TextView" -> view = new SkinCompatTextView(context, attrs);
+            case "ImageView" -> view = new SkinCompatImageView(context, attrs);
+            case "Button" -> view = new SkinCompatButton(context, attrs);
+            case "EditText" -> view = new SkinCompatEditText(context, attrs);
+            case "Spinner" -> view = new SkinCompatSpinner(context, attrs);
+            case "ImageButton" -> view = new SkinCompatImageButton(context, attrs);
+            case "CheckBox" -> view = new SkinCompatCheckBox(context, attrs);
+            case "RadioButton" -> view = new SkinCompatRadioButton(context, attrs);
+            case "RadioGroup" -> view = new SkinCompatRadioGroup(context, attrs);
+            case "CheckedTextView" -> view = new SkinCompatCheckedTextView(context, attrs);
+            case "AutoCompleteTextView" -> view = new SkinCompatAutoCompleteTextView(context, attrs);
+            case "MultiAutoCompleteTextView" -> view = new SkinCompatMultiAutoCompleteTextView(context, attrs);
+            case "RatingBar" -> view = new SkinCompatRatingBar(context, attrs);
+            case "SeekBar" -> view = new SkinCompatSeekBar(context, attrs);
+            case "ProgressBar" -> view = new SkinCompatProgressBar(context, attrs);
+            case "ScrollView" -> view = new SkinCompatScrollView(context, attrs);
+            default -> {
+            }
         }
         return view;
     }

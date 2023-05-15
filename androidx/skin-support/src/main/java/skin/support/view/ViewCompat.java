@@ -11,9 +11,6 @@ public class ViewCompat {
      * @return true if there is a listener, false if there is none.
      */
     public static boolean hasOnClickListeners(View view) {
-        if (Build.VERSION.SDK_INT >= 15) {
-            return view.hasOnClickListeners();
-        }
-        return false;
+        return view.hasOnClickListeners();
     }
 }
