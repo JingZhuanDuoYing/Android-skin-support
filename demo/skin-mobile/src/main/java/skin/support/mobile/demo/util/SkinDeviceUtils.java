@@ -199,11 +199,6 @@ public class SkinDeviceUtils {
         return board != null && board.toLowerCase().contains(ZUKZ1);
     }
 
-    public static boolean isZTKC2016() {
-        final String board = android.os.Build.MODEL;
-        return board != null && board.toLowerCase().contains(ZTEC2016);
-    }
-
     private static boolean isPhone(String[] boards) {
         final String board = android.os.Build.BOARD;
         if (board == null) {
@@ -234,7 +229,6 @@ public class SkinDeviceUtils {
         }
     }
 
-    @TargetApi(19)
     private static boolean checkOp(Context context, int op) {
         final int version = Build.VERSION.SDK_INT;
         if (version >= Build.VERSION_CODES.KITKAT) {

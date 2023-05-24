@@ -21,10 +21,7 @@ public class SkinCompatTextHelper extends SkinCompatHelper {
     private static final String TAG = SkinCompatTextHelper.class.getSimpleName();
 
     public static SkinCompatTextHelper create(TextView textView) {
-        if (Build.VERSION.SDK_INT >= 17) {
-            return new SkinCompatTextHelperV17(textView);
-        }
-        return new SkinCompatTextHelper(textView);
+        return new SkinCompatTextHelperV17(textView);
     }
 
     final TextView mView;

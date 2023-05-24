@@ -91,7 +91,7 @@ public class SkinMaterialBottomNavigationView extends BottomNavigationView imple
     }
 
     private boolean shouldDrawCompatibilityTopDivider() {
-        return Build.VERSION.SDK_INT < 21 && !(getBackground() instanceof MaterialShapeDrawable);
+        return false;
     }
 
     private void addCompatibilityTopDivider(@NonNull Context context) {

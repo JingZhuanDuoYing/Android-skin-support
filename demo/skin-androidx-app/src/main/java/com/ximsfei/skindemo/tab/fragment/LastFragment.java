@@ -26,12 +26,10 @@ public class LastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, null);
         mEdit = (EditText) view.findViewById(R.id.edit);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            mEdit.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.drawable_left_selector,
-                    R.drawable.drawable_top_selector,
-                    R.drawable.drawable_right_selector,
-                    R.drawable.drawable_bottom_selector);
-        }
+        mEdit.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.drawable_left_selector,
+                R.drawable.drawable_top_selector,
+                R.drawable.drawable_right_selector,
+                R.drawable.drawable_bottom_selector);
         mEdit1 = (EditText) view.findViewById(R.id.edit1);
         mEdit1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.drawable_left_selector,
                 R.drawable.drawable_top_selector,

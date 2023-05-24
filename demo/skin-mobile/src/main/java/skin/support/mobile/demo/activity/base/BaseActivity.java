@@ -44,9 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity implements SkinComp
     }
 
     private void updateStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(SkinCompatResources.getColor(this, R.color.colorPrimary));
-        }
+        getWindow().setStatusBarColor(SkinCompatResources.getColor(this, R.color.colorPrimary));
         // 修改状态栏字体颜色
         boolean useDarkStatusBar = getResources().getBoolean(R.bool.use_dark_status);
         int resId = SkinCompatResources.getInstance().getTargetResId(this, R.bool.use_dark_status);

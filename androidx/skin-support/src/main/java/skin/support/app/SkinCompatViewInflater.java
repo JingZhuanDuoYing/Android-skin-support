@@ -123,8 +123,7 @@ public class SkinCompatViewInflater {
     private void checkOnClickListener(View view, AttributeSet attrs) {
         final Context context = view.getContext();
 
-        if (!(context instanceof ContextWrapper) ||
-                (Build.VERSION.SDK_INT >= 15 && !ViewCompat.hasOnClickListeners(view))) {
+        if (!(context instanceof ContextWrapper) || !ViewCompat.hasOnClickListeners(view)) {
             // Skip our compat functionality if: the Context isn't a ContextWrapper, or
             // the view doesn't have an OnClickListener (we can only rely on this on API 15+ so
             // always use our compat code on older devices)

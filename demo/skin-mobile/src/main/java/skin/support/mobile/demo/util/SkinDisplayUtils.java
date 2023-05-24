@@ -112,33 +112,6 @@ public class SkinDisplayUtils {
     public static int[] getRealScreenSize(Context context) {
         // 切换屏幕导致宽高变化时不能用 cache，先去掉 cache
         return doGetRealScreenSize(context);
-//        if (SkinDeviceUtils.isEssentialPhone() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            // Essential Phone 8.0版本后，Display size 会根据挖孔屏的设置而得到不同的结果，不能信任 cache
-//            return doGetRealScreenSize(context);
-//        }
-//        int orientation = context.getResources().getConfiguration().orientation;
-//        int[] result;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            result = sLandscapeRealSizeCache;
-//            if (result == null) {
-//                result = doGetRealScreenSize(context);
-//                if(result[0] > result[1]){
-//                    // the result may be wrong sometimes, do not cache !!!!
-//                    sLandscapeRealSizeCache = result;
-//                }
-//            }
-//            return result;
-//        } else {
-//            result = sPortraitRealSizeCache;
-//            if (result == null) {
-//                result = doGetRealScreenSize(context);
-//                if(result[0] < result[1]){
-//                    // the result may be wrong sometimes, do not cache !!!!
-//                    sPortraitRealSizeCache = result;
-//                }
-//            }
-//            return result;
-//        }
     }
 
     private static int[] doGetRealScreenSize(Context context) {
@@ -157,18 +130,15 @@ public class SkinDisplayUtils {
             heightPixels = (Integer) Display.class.getMethod("getRawHeight").invoke(d);
         } catch (Exception ignored) {
         }
-        if (Build.VERSION.SDK_INT >= 17) {
-            try {
-                // used when SDK_INT >= 17; includes window decorations (statusbar bar/menu bar)
-                Point realSize = new Point();
-                d.getRealSize(realSize);
+        try {
+            // used when SDK_INT >= 17; includes window decorations (statusbar bar/menu bar)
+            Point realSize = new Point();
+            d.getRealSize(realSize);
 
-
-                Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
-                widthPixels = realSize.x;
-                heightPixels = realSize.y;
-            } catch (Exception ignored) {
-            }
+            Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
+            widthPixels = realSize.x;
+            heightPixels = realSize.y;
+        } catch (Exception ignored) {
         }
 
         size[0] = widthPixels;
@@ -412,12 +382,7 @@ public class SkinDisplayUtils {
     @SuppressWarnings("SimplifiableIfStatement")
     public static boolean hasHardwareMenuKey(Context context) {
         boolean flag;
-        if (Build.VERSION.SDK_INT < 11)
-            flag = true;
-        else if (Build.VERSION.SDK_INT >= 14) {
-            flag = ViewConfiguration.get(context).hasPermanentMenuKey();
-        } else
-            flag = false;
+        flag = ViewConfiguration.get(context).hasPermanentMenuKey();
         return flag;
     }
 
@@ -535,7 +500,7 @@ public class SkinDisplayUtils {
 
 
     public static boolean isElevationSupported() {
-        return android.os.Build.VERSION.SDK_INT >= 21;
+        return true;
     }
 
     public static boolean hasNavigationBar(Context context) {
