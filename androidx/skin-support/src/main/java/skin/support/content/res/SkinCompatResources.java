@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.LruCache;
 import android.util.TypedValue;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class SkinCompatResources {
     private SkinCompatManager.SkinLoaderStrategy mStrategy;
     private boolean isDefaultSkin = true;
     private List<SkinResources> mSkinResources = new ArrayList<>();
+
+    private LruCache<String, Integer> skinResIdCache = null;
 
     private SkinCompatResources() {
     }
@@ -108,6 +111,16 @@ public class SkinCompatResources {
     }
 
     public int getTargetResId(Context context, int resId) {
+        String cacheKey = mSkinName + resId;
+        Integer cacheValue = null;
+        if (skinResIdCache != null) {
+            cacheValue = skinResIdCache.get(cacheKey);
+        } else {
+            skinResIdCache = new LruCache<>(512);
+        }
+        if (cacheValue != null) {
+            return cacheValue;
+        }
         try {
             String resName = null;
             if (mStrategy != null) {
@@ -117,7 +130,10 @@ public class SkinCompatResources {
                 resName = context.getResources().getResourceEntryName(resId);
             }
             String type = context.getResources().getResourceTypeName(resId);
-            return mResources.getIdentifier(resName, type, mSkinPkgName);
+
+            int targetResId = mResources.getIdentifier(resName, type, mSkinPkgName);
+            skinResIdCache.put(mSkinName + resId, targetResId);
+            return targetResId;
         } catch (Exception e) {
             // 换肤失败不至于应用崩溃.
             return 0;
