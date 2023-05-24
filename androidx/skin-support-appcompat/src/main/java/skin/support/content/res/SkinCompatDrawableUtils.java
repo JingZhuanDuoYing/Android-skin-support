@@ -2,9 +2,6 @@ package skin.support.content.res;
 
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.Build;
 import androidx.annotation.NonNull;
@@ -33,15 +30,6 @@ class SkinCompatDrawableUtils {
      * there is a known issue in the given drawable's implementation.
      */
     public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
-        if (Build.VERSION.SDK_INT < 15 && drawable instanceof InsetDrawable) {
-            return false;
-        } else if (Build.VERSION.SDK_INT < 15 && drawable instanceof GradientDrawable) {
-            // GradientDrawable has a bug pre-ICS which results in mutate() resulting
-            // in loss of color
-            return false;
-        } else if (Build.VERSION.SDK_INT < 17 && drawable instanceof LayerDrawable) {
-            return false;
-        }
 
         if (drawable instanceof DrawableContainer) {
             // If we have a DrawableContainer, let's traverse it's child array
