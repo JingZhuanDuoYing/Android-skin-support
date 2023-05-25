@@ -83,27 +83,7 @@ public class SkinMaterialBottomNavigationView extends BottomNavigationView imple
 
         attributes.recycle();
 
-        if (shouldDrawCompatibilityTopDivider()) {
-            addCompatibilityTopDivider(context);
-        }
-
         applyWindowInsets();
-    }
-
-    private boolean shouldDrawCompatibilityTopDivider() {
-        return false;
-    }
-
-    private void addCompatibilityTopDivider(@NonNull Context context) {
-        View divider = new View(context);
-        divider.setBackgroundColor(
-                ContextCompat.getColor(context, R.color.design_bottom_navigation_shadow_color));
-        FrameLayout.LayoutParams dividerParams =
-                new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        getResources().getDimensionPixelSize(R.dimen.design_bottom_navigation_shadow_height));
-        divider.setLayoutParams(dividerParams);
-        addView(divider);
     }
 
     private void applyWindowInsets() {

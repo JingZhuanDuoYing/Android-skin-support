@@ -5,8 +5,8 @@ import android.graphics.drawable.DrawableContainer;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.Build;
 import androidx.annotation.NonNull;
-
-import skin.support.utils.SkinCompatVersionUtils;
+import androidx.appcompat.graphics.drawable.DrawableWrapper;
+import androidx.core.graphics.drawable.WrappedDrawable;
 
 class SkinCompatDrawableUtils {
 
@@ -32,7 +32,7 @@ class SkinCompatDrawableUtils {
     public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
 
         if (drawable instanceof DrawableContainer) {
-            // If we have a DrawableContainer, let's traverse it's child array
+            // If we have a DrawableContainer, let's traverse its child array
             final Drawable.ConstantState state = drawable.getConstantState();
             if (state instanceof DrawableContainer.DrawableContainerState) {
                 final DrawableContainer.DrawableContainerState containerState =
@@ -43,17 +43,12 @@ class SkinCompatDrawableUtils {
                     }
                 }
             }
-        } else if (SkinCompatVersionUtils.isV4DrawableWrapper(drawable)) {
-            return canSafelyMutateDrawable(SkinCompatVersionUtils.getV4DrawableWrapperWrappedDrawable(drawable));
-        } else if (SkinCompatVersionUtils.isV4WrappedDrawable(drawable)) {
-            return canSafelyMutateDrawable(SkinCompatVersionUtils.getV4WrappedDrawableWrappedDrawable(drawable));
-        } else if (SkinCompatVersionUtils.isV7DrawableWrapper(drawable)) {
-            return canSafelyMutateDrawable(SkinCompatVersionUtils.getV7DrawableWrapperWrappedDrawable(drawable));
+        } else if (drawable instanceof WrappedDrawable) {
+            return canSafelyMutateDrawable(((WrappedDrawable) drawable).getWrappedDrawable());
+        } else if (drawable instanceof DrawableWrapper) {
+            return canSafelyMutateDrawable(((DrawableWrapper) drawable).getWrappedDrawable());
         } else if (drawable instanceof ScaleDrawable) {
-            Drawable scaleDrawable = ((ScaleDrawable) drawable).getDrawable();
-            if (scaleDrawable != null) {
-                return canSafelyMutateDrawable(scaleDrawable);
-            }
+            return canSafelyMutateDrawable(((ScaleDrawable) drawable).getDrawable());
         }
 
         return true;

@@ -17,10 +17,11 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.ProgressBar;
 
+import androidx.core.graphics.drawable.WrappedDrawable;
+
 import skin.support.R;
 import skin.support.content.res.SkinCompatResources;
 import skin.support.content.res.SkinCompatVectorResources;
-import skin.support.utils.SkinCompatVersionUtils;
 
 /**
  * Created by ximsfei on 2017/1/20.
@@ -59,17 +60,11 @@ public class SkinCompatProgressBarHelper extends SkinCompatHelper {
      * traverse layer and state list drawables.
      */
     private Drawable tileify(Drawable drawable, boolean clip) {
-        if (SkinCompatVersionUtils.isV4WrappedDrawable(drawable)) {
-            Drawable inner = SkinCompatVersionUtils.getV4WrappedDrawableWrappedDrawable(drawable);
+        if (drawable instanceof WrappedDrawable) {
+            Drawable inner = ((WrappedDrawable) drawable).getWrappedDrawable();
             if (inner != null) {
                 inner = tileify(inner, clip);
-                SkinCompatVersionUtils.setV4WrappedDrawableWrappedDrawable(drawable, inner);
-            }
-        } else if (SkinCompatVersionUtils.isV4DrawableWrapper(drawable)) {
-            Drawable inner = SkinCompatVersionUtils.getV4DrawableWrapperWrappedDrawable(drawable);
-            if (inner != null) {
-                inner = tileify(inner, clip);
-                SkinCompatVersionUtils.setV4DrawableWrapperWrappedDrawable(drawable, inner);
+                ((WrappedDrawable) drawable).setWrappedDrawable(inner);
             }
         } else if (drawable instanceof LayerDrawable) {
             LayerDrawable background = (LayerDrawable) drawable;

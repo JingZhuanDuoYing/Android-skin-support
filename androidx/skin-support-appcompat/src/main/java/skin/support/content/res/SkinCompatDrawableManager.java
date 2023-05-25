@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appcompat.graphics.drawable.AnimatedStateListDrawableCompat;
+import androidx.appcompat.widget.ThemeUtils;
 import androidx.appcompat.widget.TintInfo;
 import androidx.appcompat.widget.VectorEnabledTintResources;
 import androidx.collection.ArrayMap;
