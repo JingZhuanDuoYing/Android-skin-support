@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.view.InflateException;
 import android.view.View;
@@ -16,7 +17,6 @@ import java.util.Map;
 import skin.support.SkinCompatManager;
 import skin.support.annotation.NonNull;
 import skin.support.annotation.Nullable;
-import skin.support.collection.ArrayMap;
 import skin.support.view.ViewCompat;
 
 /**
