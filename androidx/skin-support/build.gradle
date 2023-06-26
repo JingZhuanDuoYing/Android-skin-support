@@ -18,6 +18,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compileOnly 'androidx.annotation:annotation:1.6.0'
 }
 
 tasks.withType(Javadoc) {

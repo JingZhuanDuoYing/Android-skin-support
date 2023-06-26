@@ -53,13 +53,9 @@ public class SkinCompatThemeUtils {
 
     public static int getThemeAttrColor(Context context, int attr) {
         TEMP_ARRAY[0] = attr;
-        TypedArray a = context.obtainStyledAttributes(null, TEMP_ARRAY);
+        TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, null, TEMP_ARRAY);
         try {
-            int resId = a.getResourceId(0, 0);
-            if (resId != 0) {
-                return SkinCompatResources.getColor(context, resId);
-            }
-            return 0;
+            return a.getColor(0, 0);
         } finally {
             a.recycle();
         }
