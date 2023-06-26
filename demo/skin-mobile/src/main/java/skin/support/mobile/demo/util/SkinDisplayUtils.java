@@ -165,8 +165,8 @@ public class SkinDisplayUtils {
         int orientation = context.getResources().getConfiguration().orientation;
         boolean isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (!hasNotch) {
-            if (isLandscape && SkinDeviceUtils.isEssentialPhone()
-                    && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O &&
+                    isLandscape && SkinDeviceUtils.isEssentialPhone()) {
                 // https://arstechnica.com/gadgets/2017/09/essential-phone-review-impressive-for-a-new-company-but-not-competitive/
                 // 这里说挖孔屏是状态栏高度的两倍， 但横屏好像小了一点点
                 result -= 2 * SkinStatusBarUtils.getStatusbarHeight(context);
@@ -205,8 +205,8 @@ public class SkinDisplayUtils {
         int orientation = context.getResources().getConfiguration().orientation;
         boolean isPortrait = orientation == Configuration.ORIENTATION_PORTRAIT;
         if (!hasNotch) {
-            if (isPortrait && SkinDeviceUtils.isEssentialPhone()
-                    && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O &&
+                    isPortrait && SkinDeviceUtils.isEssentialPhone()) {
                 // https://arstechnica.com/gadgets/2017/09/essential-phone-review-impressive-for-a-new-company-but-not-competitive/
                 // 这里说挖孔屏是状态栏高度的两倍
                 result -= 2 * SkinStatusBarUtils.getStatusbarHeight(context);

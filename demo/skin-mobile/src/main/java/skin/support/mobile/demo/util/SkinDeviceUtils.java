@@ -1,10 +1,7 @@
 package skin.support.mobile.demo.util;
 
-import android.annotation.TargetApi;
-import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -26,7 +23,6 @@ public class SkinDeviceUtils {
     private static final String KEY_FLYME_VERSION_NAME = "ro.build.display.id";
     private final static String FLYME = "flyme";
     private final static String ZTEC2016 = "zte c2016";
-    private final static String ZUKZ1 = "zuk z1";
     private final static String ESSENTIAL = "essential";
     private final static String MEIZUBOARD[] = {"m9", "M9", "mx", "MX"};
     private static String sMiuiVersionName;
@@ -170,7 +166,7 @@ public class SkinDeviceUtils {
      * https://dev.mi.com/doc/?p=254
      */
     public static boolean isXiaomi() {
-        return Build.MANUFACTURER.toLowerCase().equals("xiaomi");
+        return Build.MANUFACTURER.equalsIgnoreCase("xiaomi");
     }
 
     public static boolean isVivo() {
@@ -190,15 +186,6 @@ public class SkinDeviceUtils {
     }
 
 
-    /**
-     * 判断是否为 ZUK Z1 和 ZTK C2016。
-     * 两台设备的系统虽然为 android 6.0，但不支持状态栏icon颜色改变，因此经常需要对它们进行额外判断。
-     */
-    public static boolean isZUKZ1() {
-        final String board = android.os.Build.MODEL;
-        return board != null && board.toLowerCase().contains(ZUKZ1);
-    }
-
     private static boolean isPhone(String[] boards) {
         final String board = android.os.Build.BOARD;
         if (board == null) {
@@ -207,39 +194,6 @@ public class SkinDeviceUtils {
         for (String board1 : boards) {
             if (board.equals(board1)) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断悬浮窗权限（目前主要用户魅族与小米的检测）。
-     */
-    public static boolean isFloatWindowOpAllowed(Context context) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 19) {
-            return checkOp(context, 24);  // 24 是AppOpsManager.OP_SYSTEM_ALERT_WINDOW 的值，该值无法直接访问
-        } else {
-            try {
-                return (context.getApplicationInfo().flags & 1 << 27) == 1 << 27;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
-    private static boolean checkOp(Context context, int op) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= Build.VERSION_CODES.KITKAT) {
-            AppOpsManager manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-            try {
-                Method method = manager.getClass().getDeclaredMethod("checkOp", int.class, int.class, String.class);
-                int property = (Integer) method.invoke(manager, op,
-                        Binder.getCallingUid(), context.getPackageName());
-                return AppOpsManager.MODE_ALLOWED == property;
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         return false;

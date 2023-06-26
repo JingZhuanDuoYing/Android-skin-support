@@ -86,15 +86,6 @@ public class SkinStatusBarUtils {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(colorOn5x);
         }
-//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            // android4.4的默认是从上到下黑到透明，我们的背景是白色，很难看，因此只做魅族和小米的
-//        } else if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1){
-//            // 如果app 为白色，需要更改状态栏颜色，因此不能让19一下支持透明状态栏
-//            Window window = activity.getWindow();
-//            Integer transparentValue = getStatusBarAPITransparentValue(activity);
-//            if(transparentValue != null) {
-//                window.getDecorView().setSystemUiVisibility(transparentValue);
-//            }
     }
 
     @TargetApi(28)
@@ -272,7 +263,7 @@ public class SkinStatusBarUtils {
      * 见小米开发文档说明：https://dev.mi.com/console/doc/detail?pId=1159
      */
     private static boolean isMIUICustomStatusBarLightModeImpl() {
-        if (SkinDeviceUtils.isMIUIV9() && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && SkinDeviceUtils.isMIUIV9()) {
             return true;
         }
         return SkinDeviceUtils.isMIUIV5() || SkinDeviceUtils.isMIUIV6() ||
