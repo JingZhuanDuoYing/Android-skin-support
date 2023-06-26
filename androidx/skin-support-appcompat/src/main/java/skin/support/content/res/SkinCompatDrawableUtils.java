@@ -1,12 +1,8 @@
 package skin.support.content.res;
 
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.ScaleDrawable;
 import android.os.Build;
 import androidx.annotation.NonNull;
-import androidx.appcompat.graphics.drawable.DrawableWrapper;
-import androidx.core.graphics.drawable.WrappedDrawable;
 
 class SkinCompatDrawableUtils {
 
@@ -30,27 +26,7 @@ class SkinCompatDrawableUtils {
      * there is a known issue in the given drawable's implementation.
      */
     public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
-
-        if (drawable instanceof DrawableContainer) {
-            // If we have a DrawableContainer, let's traverse its child array
-            final Drawable.ConstantState state = drawable.getConstantState();
-            if (state instanceof DrawableContainer.DrawableContainerState) {
-                final DrawableContainer.DrawableContainerState containerState =
-                        (DrawableContainer.DrawableContainerState) state;
-                for (final Drawable child : containerState.getChildren()) {
-                    if (!canSafelyMutateDrawable(child)) {
-                        return false;
-                    }
-                }
-            }
-        } else if (drawable instanceof WrappedDrawable) {
-            return canSafelyMutateDrawable(((WrappedDrawable) drawable).getWrappedDrawable());
-        } else if (drawable instanceof DrawableWrapper) {
-            return canSafelyMutateDrawable(((DrawableWrapper) drawable).getWrappedDrawable());
-        } else if (drawable instanceof ScaleDrawable) {
-            return canSafelyMutateDrawable(((ScaleDrawable) drawable).getDrawable());
-        }
-
+        // We'll never return false on API level >= 17, stop early.
         return true;
     }
 
