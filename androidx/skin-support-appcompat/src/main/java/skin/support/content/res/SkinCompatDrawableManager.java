@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.graphics.drawable.AnimatedStateListDrawableCompat;
+import androidx.appcompat.widget.ThemeUtils;
 import androidx.appcompat.widget.TintInfo;
 import androidx.collection.ArrayMap;
 import androidx.collection.LongSparseArray;
@@ -36,6 +37,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import static androidx.appcompat.content.res.AppCompatResources.getColorStateList;
 import static androidx.core.graphics.ColorUtils.compositeColors;
 import static skin.support.content.res.SkinCompatThemeUtils.getDisabledThemeAttrColor;
 import static skin.support.content.res.SkinCompatThemeUtils.getThemeAttrColor;
@@ -487,36 +489,42 @@ final class SkinCompatDrawableManager {
         return mode;
     }
 
+    public ColorStateList getTintListForDrawableRes(@NonNull Context context,
+                                                    int resId) {
+        // ...if the cache did not contain a color state list, try and create one
+        if (resId == R.drawable.abc_edit_text_material) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_edittext);
+        } else if (resId == R.drawable.abc_switch_track_mtrl_alpha) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_switch_track);
+        } else if (resId == R.drawable.abc_switch_thumb_material) {
+            return createSwitchThumbColorStateList(context);
+        } else if (resId == R.drawable.abc_btn_default_mtrl_shape) {
+            return createDefaultButtonColorStateList(context);
+        } else if (resId == R.drawable.abc_btn_borderless_material) {
+            return createBorderlessButtonColorStateList(context);
+        } else if (resId == R.drawable.abc_btn_colored_material) {
+            return createColoredButtonColorStateList(context);
+        } else if (resId == R.drawable.abc_spinner_mtrl_am_alpha
+                || resId == R.drawable.abc_spinner_textfield_background_material) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_spinner);
+        } else if (arrayContains(TINT_COLOR_CONTROL_NORMAL, resId)) {
+            return getThemeAttrColorStateList(context, R.attr.colorControlNormal);
+        } else if (arrayContains(TINT_COLOR_CONTROL_STATE_LIST, resId)) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_default);
+        } else if (arrayContains(TINT_CHECKABLE_BUTTON_LIST, resId)) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_btn_checkable);
+        } else if (resId == R.drawable.abc_seekbar_thumb_material) {
+            return SkinCompatResources.getColorStateList(context, R.color.abc_tint_seek_thumb);
+        }
+        return null;
+    }
+
     synchronized ColorStateList getTintList(@NonNull Context context, @DrawableRes int resId) {
         // Try the cache first (if it exists)
         ColorStateList tint = getTintListFromCache(context, resId);
 
         if (tint == null) {
-            // ...if the cache did not contain a color state list, try and create one
-            if (resId == R.drawable.abc_edit_text_material) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_edittext);
-            } else if (resId == R.drawable.abc_switch_track_mtrl_alpha) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_switch_track);
-            } else if (resId == R.drawable.abc_switch_thumb_material) {
-                tint = createSwitchThumbColorStateList(context);
-            } else if (resId == R.drawable.abc_btn_default_mtrl_shape) {
-                tint = createDefaultButtonColorStateList(context);
-            } else if (resId == R.drawable.abc_btn_borderless_material) {
-                tint = createBorderlessButtonColorStateList(context);
-            } else if (resId == R.drawable.abc_btn_colored_material) {
-                tint = createColoredButtonColorStateList(context);
-            } else if (resId == R.drawable.abc_spinner_mtrl_am_alpha
-                    || resId == R.drawable.abc_spinner_textfield_background_material) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_spinner);
-            } else if (arrayContains(TINT_COLOR_CONTROL_NORMAL, resId)) {
-                tint = getThemeAttrColorStateList(context, R.attr.colorControlNormal);
-            } else if (arrayContains(TINT_COLOR_CONTROL_STATE_LIST, resId)) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_default);
-            } else if (arrayContains(TINT_CHECKABLE_BUTTON_LIST, resId)) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_btn_checkable);
-            } else if (resId == R.drawable.abc_seekbar_thumb_material) {
-                tint = SkinCompatResources.getColorStateList(context, R.color.abc_tint_seek_thumb);
-            }
+            tint = getTintListForDrawableRes(context, resId);
 
             if (tint != null) {
                 addTintListToCache(context, resId, tint);
