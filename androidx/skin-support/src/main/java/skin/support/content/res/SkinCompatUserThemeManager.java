@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.LongSparseArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,7 +37,7 @@ public class SkinCompatUserThemeManager {
     private static final String KEY_DRAWABLE_NAME = "drawableName";
     private static final String KEY_DRAWABLE_PATH_AND_ANGLE = "drawablePathAndAngle";
 
-    private static SkinCompatUserThemeManager INSTANCE = new SkinCompatUserThemeManager();
+    private static final SkinCompatUserThemeManager INSTANCE = new SkinCompatUserThemeManager();
 
     private final HashMap<String, ColorState> mColorNameStateMap = new HashMap<>();
     private final Object mColorCacheLock = new Object();
@@ -45,7 +46,7 @@ public class SkinCompatUserThemeManager {
 
     private final HashMap<String, String> mDrawablePathAndAngleMap = new HashMap<>();
     private final Object mDrawableCacheLock = new Object();
-    private final WeakHashMap<Integer, WeakReference<Drawable>> mDrawableCaches = new WeakHashMap<>();
+    private final LongSparseArray<Drawable> mDrawableCaches = new LongSparseArray<>(20);
     private boolean mDrawableEmpty;
 
     private SkinCompatUserThemeManager() {
@@ -351,14 +352,11 @@ public class SkinCompatUserThemeManager {
 
     private Drawable getCachedDrawable(@DrawableRes int drawableRes) {
         synchronized (mDrawableCacheLock) {
-            WeakReference<Drawable> drawableRef = mDrawableCaches.get(drawableRes);
-            if (drawableRef != null) {
-                Drawable drawable = drawableRef.get();
-                if (drawable != null) {
-                    return drawable;
-                } else {
-                    mDrawableCaches.remove(drawableRes);
-                }
+            Drawable drawable = mDrawableCaches.get(drawableRes);
+            if (drawable != null) {
+                return drawable;
+            } else {
+                mDrawableCaches.remove(drawableRes);
             }
         }
         return null;
@@ -367,7 +365,7 @@ public class SkinCompatUserThemeManager {
     private void addDrawableToCache(@DrawableRes int drawableRes, Drawable drawable) {
         if (drawable != null) {
             synchronized (mDrawableCacheLock) {
-                mDrawableCaches.put(drawableRes, new WeakReference<>(drawable));
+                mDrawableCaches.put(drawableRes, drawable);
             }
         }
     }
