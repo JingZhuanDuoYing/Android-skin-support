@@ -33,11 +33,11 @@ dependencies {
 
     implementation project(':androidx:skin-support-appcompat')
 
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation project(':androidx:skin-support-design')
 //    implementation 'skin.support:skin-support-design:3.0.0'
 
-    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     implementation project(':androidx:skin-support-constraint-layout')
 //    implementation 'skin.support:skin-support-constraint-layout:3.0.0'
 
@@ -46,7 +46,7 @@ dependencies {
 //    implementation 'skin.support:skin-support-cardview:3.0.0'
 
     // 第三方控件库换肤支持
-    implementation 'de.hdodenhof:circleimageview:2.1.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 //    implementation project(':third-part-support:circleimageview')
 //    implementation 'skin.support:circleimageview:2.1.0.1'
 
