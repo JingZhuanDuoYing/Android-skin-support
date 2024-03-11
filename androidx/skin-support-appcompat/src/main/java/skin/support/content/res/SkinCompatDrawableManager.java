@@ -150,11 +150,11 @@ final class SkinCompatDrawableManager {
             R.drawable.abc_btn_radio_material_anim
     };
 
-    private WeakHashMap<Context, SparseArrayCompat<ColorStateList>> mTintLists;
+    private WeakHashMap<Integer, SparseArrayCompat<ColorStateList>> mTintLists;
     private ArrayMap<String, InflateDelegate> mDelegates;
     private SparseArrayCompat<String> mKnownDrawableIdTags;
 
-    private final WeakHashMap<Context, LongSparseArray<WeakReference<Drawable.ConstantState>>>
+    private final WeakHashMap<Integer, LongSparseArray<WeakReference<Drawable.ConstantState>>>
             mDrawableCaches = new WeakHashMap<>(0);
 
     private TypedValue mTypedValue;
@@ -200,7 +200,7 @@ final class SkinCompatDrawableManager {
     }
 
     public synchronized void onConfigurationChanged(@NonNull Context context) {
-        LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+        LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context.hashCode());
         if (cache != null) {
             // Crude, but we'll just clear the cache when the configuration changes
             cache.clear();
@@ -375,7 +375,7 @@ final class SkinCompatDrawableManager {
 
     private synchronized Drawable getCachedDrawable(@NonNull final Context context,
             final long key) {
-        final LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+        final LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context.hashCode());
         if (cache == null) {
             return null;
         }
@@ -398,10 +398,11 @@ final class SkinCompatDrawableManager {
             @NonNull final Drawable drawable) {
         final ConstantState cs = drawable.getConstantState();
         if (cs != null) {
-            LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(context);
+            final int hashCode = context.hashCode();
+            LongSparseArray<WeakReference<ConstantState>> cache = mDrawableCaches.get(hashCode);
             if (cache == null) {
                 cache = new LongSparseArray<>();
-                mDrawableCaches.put(context, cache);
+                mDrawableCaches.put(hashCode, cache);
             }
             cache.put(key, new WeakReference<>(cs));
             return true;
@@ -535,7 +536,7 @@ final class SkinCompatDrawableManager {
 
     private ColorStateList getTintListFromCache(@NonNull Context context, @DrawableRes int resId) {
         if (mTintLists != null) {
-            final SparseArrayCompat<ColorStateList> tints = mTintLists.get(context);
+            final SparseArrayCompat<ColorStateList> tints = mTintLists.get(context.hashCode());
             return tints != null ? tints.get(resId) : null;
         }
         return null;
@@ -546,10 +547,11 @@ final class SkinCompatDrawableManager {
         if (mTintLists == null) {
             mTintLists = new WeakHashMap<>();
         }
-        SparseArrayCompat<ColorStateList> themeTints = mTintLists.get(context);
+        int ctxHashCode = context.hashCode();
+        SparseArrayCompat<ColorStateList> themeTints = mTintLists.get(ctxHashCode);
         if (themeTints == null) {
             themeTints = new SparseArrayCompat<>();
-            mTintLists.put(context, themeTints);
+            mTintLists.put(ctxHashCode, themeTints);
         }
         themeTints.append(resId, tintList);
     }
