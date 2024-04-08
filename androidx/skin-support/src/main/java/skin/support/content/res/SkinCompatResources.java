@@ -12,6 +12,8 @@ import android.text.TextUtils;
 import android.util.LruCache;
 import android.util.TypedValue;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,13 +158,13 @@ public class SkinCompatResources {
         if (!isDefaultSkin) {
             int targetResId = getTargetResId(context, resId);
             if (targetResId != 0) {
-                return mResources.getColor(targetResId);
+                return ResourcesCompat.getColor(mResources, targetResId, null);
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getResources().getColor(resId, context.getTheme());
+            return ResourcesCompat.getColor(context.getResources(), resId, context.getTheme());
         }
-        return context.getResources().getColor(resId);
+        return ResourcesCompat.getColor(context.getResources(), resId, null);
     }
 
     private ColorStateList getSkinColorStateList(Context context, int resId) {
@@ -181,13 +183,10 @@ public class SkinCompatResources {
         if (!isDefaultSkin) {
             int targetResId = getTargetResId(context, resId);
             if (targetResId != 0) {
-                return mResources.getColorStateList(targetResId);
+                return ResourcesCompat.getColorStateList(mResources, targetResId, null);
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getResources().getColorStateList(resId, context.getTheme());
-        }
-        return context.getResources().getColorStateList(resId);
+        return ResourcesCompat.getColorStateList(context.getResources(), resId, context.getTheme());
     }
 
     private Drawable getSkinDrawable(Context context, int resId) {
@@ -212,10 +211,10 @@ public class SkinCompatResources {
         if (!isDefaultSkin) {
             int targetResId = getTargetResId(context, resId);
             if (targetResId != 0) {
-                return mResources.getDrawable(targetResId);
+                return ResourcesCompat.getDrawable(mResources, targetResId, null);
             }
         }
-        return context.getResources().getDrawable(resId, context.getTheme());
+        return ResourcesCompat.getDrawable(context.getResources(), resId, context.getTheme());
     }
 
     Drawable getStrategyDrawable(Context context, int resId) {

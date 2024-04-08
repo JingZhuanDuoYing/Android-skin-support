@@ -20,6 +20,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     compileOnly 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.core:core:1.12.0'
 }
 
 tasks.withType(Javadoc) {

@@ -259,7 +259,7 @@ public class SkinCompatUserThemeManager {
                     String path = splits[0];
                     int angle = 0;
                     if (splits.length == 2) {
-                        angle = Integer.valueOf(splits[1]);
+                        angle = Integer.parseInt(splits[1]);
                     }
                     if (checkPathValid(path)) {
                         if (angle == 0) {
