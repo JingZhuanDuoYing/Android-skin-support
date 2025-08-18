@@ -24,7 +24,7 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
     private SkinCompatViewInflater mSkinCompatViewInflater;
 
     private final Set<WeakReference<SkinCompatSupportable>> mSkinHelpers =
-            Collections.newSetFromMap(new ConcurrentHashMap<>(100));;
+            Collections.newSetFromMap(new ConcurrentHashMap<>(100));
 
     private SkinCompatDelegate(Context context) {
         mContext = context;
@@ -78,11 +78,13 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
     }
 
     public void applySkin() {
-        if (!mSkinHelpers.isEmpty()) {
-            for (WeakReference<SkinCompatSupportable> ref : mSkinHelpers) {
-                if (ref != null && ref.get() != null) {
-                    ref.get().applySkin();
-                }
+        if (mSkinHelpers.isEmpty()) {
+            return;
+        }
+        for (WeakReference<SkinCompatSupportable> ref : mSkinHelpers) {
+            SkinCompatSupportable helper = ref.get();
+            if (helper != null) {
+                helper.applySkin();
             }
         }
     }
