@@ -16,7 +16,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.1'
+        classpath 'com.android.tools.build:gradle:8.10.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.27.0'
@@ -26,14 +26,23 @@ buildscript {
 allprojects { project ->
     repositories {
         maven {
-            url 'https://repo.huaweicloud.com/repository/maven/'
+            url = 'https://repo.huaweicloud.com/repository/maven/'
         }
         maven {
-            url 'https://mirrors.tencent.com/nexus/repository/maven-public'
+            url = 'https://mirrors.tencent.com/nexus/repository/maven-public'
         }
         maven {
-            url 'https://maven.google.com/'
-            name 'Google'
+            url = 'https://maven.google.com/'
+            name = 'Google'
+        }
+        maven {
+            url = 'https://repo.huaweicloud.com/repository/maven/'
+        }
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force 'androidx.annotation:annotation:1.9.1'
         }
     }
 
@@ -66,7 +75,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 34
+    compileSdkVersion = 36
     minSdkVersion = 21
     targetSdkVersion = 33
 

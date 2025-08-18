@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "skin.support.mobile.demo"
@@ -37,17 +37,20 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.google.android.material:material:1.12.0'
 
 //    implementation 'skin.support:skin-support:4.0.5'                   // skin-support
 //    implementation 'skin.support:skin-support-appcompat:4.0.5'         // skin-support 基础控件支持
 //    implementation 'skin.support:skin-support-design:4.0.5'            // skin-support-design material design 控件支持[可选]
-    implementation 'skin.support:skin-support-cardview:4.0.5'          // skin-support-cardview CardView 控件支持[可选]
-    implementation 'skin.support:skin-support-constraint-layout:4.0.5' // skin-support-constraint-layout ConstraintLayout 控件支持[可选]
+
+    compileOnly 'androidx.annotation:annotation:1.9.1'
+
+    implementation project(':androidx:skin-support-cardview')             // skin-support-cardview CardView 控件支持[可选]
+    implementation project(':androidx:skin-support-constraint-layout')    // skin-support-constraint-layout ConstraintLayout 控件支持[可选]
 
     implementation project(':androidx:skin-support')
     implementation project(':androidx:skin-support-appcompat')

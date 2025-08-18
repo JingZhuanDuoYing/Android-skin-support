@@ -18,7 +18,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation project(':androidx:skin-support')
     implementation project(':androidx:skin-support-appcompat')
 }
