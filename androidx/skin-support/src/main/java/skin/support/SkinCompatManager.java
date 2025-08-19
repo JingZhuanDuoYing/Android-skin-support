@@ -36,10 +36,10 @@ public class SkinCompatManager extends SkinObservable {
     private final Object mLock = new Object();
     private final Context mAppContext;
     private boolean mLoading = false;
-    private List<SkinWrapper> mWrappers = new ArrayList<>();
-    private List<SkinLayoutInflater> mInflaters = new ArrayList<>();
-    private List<SkinLayoutInflater> mHookInflaters = new ArrayList<>();
-    private SparseArray<SkinLoaderStrategy> mStrategyMap = new SparseArray<>();
+    private List<SkinWrapper> mWrappers;
+    private List<SkinLayoutInflater> mInflaters;
+    private final List<SkinLayoutInflater> mHookInflaters = new ArrayList<>();
+    private final SparseArray<SkinLoaderStrategy> mStrategyMap = new SparseArray<>();
     private boolean mSkinAllActivityEnable = true;
     private boolean mSkinStatusBarColorEnable = false;
     private boolean mSkinWindowBackgroundColorEnable = true;
@@ -133,8 +133,7 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 初始化换肤框架. 通过该方法初始化，应用中Activity需继承自{@link skin.support.app.SkinCompatActivity}.
      *
-     * @param context
-     * @return
+     * @param context Context
      */
     public static SkinCompatManager init(Context context) {
         if (sInstance == null) {
@@ -156,7 +155,6 @@ public class SkinCompatManager extends SkinObservable {
      * 初始化换肤框架，监听Activity生命周期. 通过该方法初始化，应用中Activity无需继承{@link skin.support.app.SkinCompatActivity}.
      *
      * @param application 应用Application.
-     * @return
      */
     public static SkinCompatManager withoutActivity(Application application) {
         init(application);
@@ -183,8 +181,7 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 添加皮肤包加载策略.
      *
-     * @param strategy 自定义加载策略
-     * @return
+     * @param strategy 自定义加载策略.
      */
     public SkinCompatManager addStrategy(SkinLoaderStrategy strategy) {
         mStrategyMap.put(strategy.getType(), strategy);
@@ -198,10 +195,12 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 自定义View换肤时，可选择添加一个{@link SkinLayoutInflater}
      *
-     * @param inflater 在{@link skin.support.app.SkinCompatViewInflater#createView(Context, String, String)}方法中调用.
-     * @return
+     * @param inflater 在{@link skin.support.app.SkinCompatViewInflater#createView(Context, String, String)}中调用.
      */
     public SkinCompatManager addInflater(SkinLayoutInflater inflater) {
+        if (mInflaters == null) {
+            mInflaters = new ArrayList<>();
+        }
         if (inflater instanceof SkinWrapper) {
             mWrappers.add((SkinWrapper) inflater);
         }
@@ -210,10 +209,16 @@ public class SkinCompatManager extends SkinObservable {
     }
 
     public List<SkinWrapper> getWrappers() {
+        if (mWrappers == null) {
+            mWrappers = new ArrayList<>();
+        }
         return mWrappers;
     }
 
     public List<SkinLayoutInflater> getInflaters() {
+        if (mInflaters == null) {
+            mInflaters = new ArrayList<>();
+        }
         return mInflaters;
     }
 
@@ -221,8 +226,7 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 自定义View换肤时，可选择添加一个{@link SkinLayoutInflater}
      *
-     * @param inflater 在{@link skin.support.app.SkinCompatViewInflater#createView(Context, String, String)}方法中最先调用.
-     * @return
+     * @param inflater 在{@link skin.support.app.SkinCompatViewInflater#createView(Context, String, String)}中优先调用.
      */
     @Deprecated
     public SkinCompatManager addHookInflater(SkinLayoutInflater inflater) {
@@ -238,7 +242,6 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 获取当前皮肤包.
      *
-     * @return
      */
     @Deprecated
     public String getCurSkinName() {
@@ -255,8 +258,7 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 设置是否所有Activity都换肤.
      *
-     * @param enable true: 所有Activity都换肤; false: 添加注解Skinable或实现SkinCompatSupportable的Activity支持换肤.
-     * @return
+     * @param enable true: 所有Activity都换肤; false: 实现SkinCompatSupportable接口的Activity支持换肤.
      */
     public SkinCompatManager setSkinAllActivityEnable(boolean enable) {
         mSkinAllActivityEnable = enable;
@@ -281,8 +283,7 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 设置WindowBackground换肤，使用Theme中的{@link android.R.attr#windowBackground}属性.
      *
-     * @param enable true: 打开; false: 关闭.
-     * @return
+     * @param enable true: 使用Theme中的{@link android.R.attr#windowBackground}属性换肤; false: 关闭.
      */
     public SkinCompatManager setSkinWindowBackgroundEnable(boolean enable) {
         mSkinWindowBackgroundColorEnable = enable;
@@ -295,8 +296,6 @@ public class SkinCompatManager extends SkinObservable {
 
     /**
      * 加载记录的皮肤包，一般在Application中初始化换肤框架后调用.
-     *
-     * @return
      */
     public AsyncTask loadSkin() {
         String skin = SkinPreference.getInstance().getSkinName();
@@ -311,7 +310,6 @@ public class SkinCompatManager extends SkinObservable {
      * 加载记录的皮肤包，一般在Application中初始化换肤框架后调用.
      *
      * @param listener 皮肤包加载监听.
-     * @return
      */
     public AsyncTask loadSkin(SkinLoaderListener listener) {
         String skin = SkinPreference.getInstance().getSkinName();
@@ -337,7 +335,6 @@ public class SkinCompatManager extends SkinObservable {
      *
      * @param skinName 皮肤包名称.
      * @param strategy 皮肤包加载策略.
-     * @return
      */
     public AsyncTask loadSkin(String skinName, int strategy) {
         return loadSkin(skinName, null, strategy);
@@ -349,7 +346,6 @@ public class SkinCompatManager extends SkinObservable {
      * @param skinName 皮肤包名称.
      * @param listener 皮肤包加载监听.
      * @param strategy 皮肤包加载策略.
-     * @return
      */
     public AsyncTask loadSkin(String skinName, SkinLoaderListener listener, int strategy) {
         SkinLoaderStrategy loaderStrategy = mStrategyMap.get(strategy);
@@ -429,7 +425,6 @@ public class SkinCompatManager extends SkinObservable {
      * 获取皮肤包包名.
      *
      * @param skinPkgPath sdcard中皮肤包路径.
-     * @return
      */
     public String getSkinPackageName(String skinPkgPath) {
         PackageManager mPm = mAppContext.getPackageManager();
@@ -441,7 +436,6 @@ public class SkinCompatManager extends SkinObservable {
      * 获取皮肤包资源{@link Resources}.
      *
      * @param skinPkgPath sdcard中皮肤包路径.
-     * @return
      */
     @Nullable
     public Resources getSkinResources(String skinPkgPath) {
