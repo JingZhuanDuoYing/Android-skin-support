@@ -9,10 +9,11 @@ import android.util.AttributeSet;
 import android.view.InflateException;
 import android.view.View;
 
+import androidx.collection.SimpleArrayMap;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import skin.support.SkinCompatManager;
 import skin.support.annotation.NonNull;
@@ -34,11 +35,14 @@ public class SkinCompatViewInflater {
             "android.webkit."
     };
 
-    private static final Map<String, Constructor<? extends View>> sConstructorMap
-            = new ArrayMap<>();
+    private static final String LOG_TAG = "AppCompatViewInflater";
+
+    private static final SimpleArrayMap<String, Constructor<? extends View>> sConstructorMap =
+            new SimpleArrayMap<>();
 
     private final Object[] mConstructorArgs = new Object[2];
 
+    @Nullable
     public final View createView(View parent, final String name, @NonNull Context context, @NonNull AttributeSet attrs) {
         View view = createViewFromHackInflater(context, name, attrs);
 
@@ -84,7 +88,7 @@ public class SkinCompatViewInflater {
         return view;
     }
 
-    public View createViewFromTag(Context context, String name, AttributeSet attrs) {
+    private View createViewFromTag(Context context, String name, AttributeSet attrs) {
         if (name.equals("view")) {
             name = attrs.getAttributeValue(null, "class");
         }
@@ -181,7 +185,7 @@ public class SkinCompatViewInflater {
         @Override
         public void onClick(@NonNull View v) {
             if (mResolvedMethod == null) {
-                resolveMethod(mHostView.getContext(), mMethodName);
+                resolveMethod(mHostView.getContext());
             }
 
             try {
@@ -195,8 +199,7 @@ public class SkinCompatViewInflater {
             }
         }
 
-        @NonNull
-        private void resolveMethod(@Nullable Context context, @NonNull String name) {
+        private void resolveMethod(@Nullable Context context) {
             while (context != null) {
                 try {
                     if (!context.isRestricted()) {
