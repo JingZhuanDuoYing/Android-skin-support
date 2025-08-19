@@ -9,10 +9,14 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import skin.support.annotation.NonNull;
 import skin.support.annotation.Nullable;
@@ -28,16 +32,28 @@ import skin.support.utils.SkinPreference;
 import skin.support.content.res.SkinCompatResources;
 
 public class SkinCompatManager extends SkinObservable {
+    private static final String TAG = "SkinCompatManager";
+
     public static final int SKIN_LOADER_STRATEGY_NONE = -1;
     public static final int SKIN_LOADER_STRATEGY_ASSETS = 0;
     public static final int SKIN_LOADER_STRATEGY_BUILD_IN = 1;
     public static final int SKIN_LOADER_STRATEGY_PREFIX_BUILD_IN = 2;
+
     private static volatile SkinCompatManager sInstance;
-    private final Object mLock = new Object();
+
+    public static SkinCompatManager getInstance() {
+        if (sInstance == null) {
+            throw new IllegalStateException("SkinCompatManager not initialized. Call init(Context) first.");
+        }
+        return sInstance;
+    }
+
+    private final ReentrantLock mLock = new ReentrantLock();
+    private final Condition mCondition = mLock.newCondition();
     private final Context mAppContext;
     private boolean mLoading = false;
-    private List<SkinWrapper> mWrappers;
-    private List<SkinLayoutInflater> mInflaters;
+    private final List<SkinWrapper> mWrappers = new ArrayList<>();
+    private final List<SkinLayoutInflater> mInflaters = new ArrayList<>();
     private final List<SkinLayoutInflater> mHookInflaters = new ArrayList<>();
     private final SparseArray<SkinLoaderStrategy> mStrategyMap = new SparseArray<>();
     private boolean mSkinAllActivityEnable = true;
@@ -114,6 +130,13 @@ public class SkinCompatManager extends SkinObservable {
          *
          * @param context  {@link Context}
          * @param skinName 皮肤包名称.
+         * @机器人
+
+        /**
+         * 开发者可以拦截应用中的资源ID，返回对应Drawable。
+         *
+         * @param context  {@link Context}
+         * @param skinName 皮肤包名称.
          * @param resId    应用中需要换肤的资源ID.
          * @return 返回对应Drawable。不需要拦截，则返回空
          */
@@ -136,6 +159,9 @@ public class SkinCompatManager extends SkinObservable {
      * @param context Context
      */
     public static SkinCompatManager init(Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Context cannot be null");
+        }
         if (sInstance == null) {
             synchronized (SkinCompatManager.class) {
                 if (sInstance == null) {
@@ -144,10 +170,6 @@ public class SkinCompatManager extends SkinObservable {
             }
         }
         SkinPreference.init(context);
-        return sInstance;
-    }
-
-    public static SkinCompatManager getInstance() {
         return sInstance;
     }
 
@@ -198,9 +220,6 @@ public class SkinCompatManager extends SkinObservable {
      * @param inflater 在{@link skin.support.app.SkinCompatViewInflater#createView(Context, String, String)}中调用.
      */
     public SkinCompatManager addInflater(SkinLayoutInflater inflater) {
-        if (mInflaters == null) {
-            mInflaters = new ArrayList<>();
-        }
         if (inflater instanceof SkinWrapper) {
             mWrappers.add((SkinWrapper) inflater);
         }
@@ -209,19 +228,12 @@ public class SkinCompatManager extends SkinObservable {
     }
 
     public List<SkinWrapper> getWrappers() {
-        if (mWrappers == null) {
-            mWrappers = new ArrayList<>();
-        }
         return mWrappers;
     }
 
     public List<SkinLayoutInflater> getInflaters() {
-        if (mInflaters == null) {
-            mInflaters = new ArrayList<>();
-        }
         return mInflaters;
     }
-
 
     /**
      * 自定义View换肤时，可选择添加一个{@link SkinLayoutInflater}
@@ -240,8 +252,10 @@ public class SkinCompatManager extends SkinObservable {
     }
 
     /**
-     * 获取当前皮肤包.
+     * 获取当前皮肤包名称。
      *
+     * @return 当前皮肤包名称
+     * @deprecated 请使用 {@link SkinPreference#getSkinName()} 替代
      */
     @Deprecated
     public String getCurSkinName() {
@@ -343,13 +357,15 @@ public class SkinCompatManager extends SkinObservable {
     /**
      * 加载皮肤包.
      *
-     * @param skinName 皮肤包名称.
-     * @param listener 皮肤包加载监听.
-     * @param strategy 皮肤包加载策略.
+     * @param skinName 皮肤包名称，不能为空。
+     * @param listener 皮肤加载监听器，用于接收加载状态回调，可为 null。
+     * @param strategy 皮肤加载策略，取值范围为 {@link #SKIN_LOADER_STRATEGY_NONE}、{@link #SKIN_LOADER_STRATEGY_ASSETS} 等。
+     * @return 返回异步任务对象，若策略无效则返回 null。
      */
     public AsyncTask loadSkin(String skinName, SkinLoaderListener listener, int strategy) {
         SkinLoaderStrategy loaderStrategy = mStrategyMap.get(strategy);
         if (loaderStrategy == null) {
+            Log.w(TAG, "Invalid strategy: " + strategy);
             return null;
         }
         return new SkinLoadTask(listener, loaderStrategy).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, skinName);
@@ -373,15 +389,19 @@ public class SkinCompatManager extends SkinObservable {
 
         @Override
         protected String doInBackground(String... params) {
-            synchronized (mLock) {
+            mLock.lock();
+            try {
                 while (mLoading) {
                     try {
-                        mLock.wait();
+                        mCondition.await();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Skin loading interrupted", e);
+                        Thread.currentThread().interrupt();
                     }
                 }
                 mLoading = true;
+            } finally {
+                mLock.unlock();
             }
             try {
                 if (params.length == 1) {
@@ -393,7 +413,7 @@ public class SkinCompatManager extends SkinObservable {
                     return params[0];
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to load skin: " + params[0], e);
             }
             SkinCompatResources.getInstance().reset();
             return null;
@@ -401,8 +421,8 @@ public class SkinCompatManager extends SkinObservable {
 
         @Override
         protected void onPostExecute(String skinName) {
-            synchronized (mLock) {
-                // skinName 为""时，恢复默认皮肤
+            mLock.lock();
+            try {
                 if (skinName != null) {
                     SkinPreference.getInstance().setSkinName(skinName).setSkinStrategy(mStrategy.getType()).commitEditor();
                     notifyUpdateSkin();
@@ -412,11 +432,13 @@ public class SkinCompatManager extends SkinObservable {
                 } else {
                     SkinPreference.getInstance().setSkinName("").setSkinStrategy(SKIN_LOADER_STRATEGY_NONE).commitEditor();
                     if (mListener != null) {
-                        mListener.onFailed("皮肤资源获取失败");
+                        mListener.onFailed("Failed to load skin resources, check logs for details");
                     }
                 }
                 mLoading = false;
-                mLock.notifyAll();
+                mCondition.signalAll();
+            } finally {
+                mLock.unlock();
             }
         }
     }
@@ -441,14 +463,18 @@ public class SkinCompatManager extends SkinObservable {
     public Resources getSkinResources(String skinPkgPath) {
         try {
             PackageInfo packageInfo = mAppContext.getPackageManager().getPackageArchiveInfo(skinPkgPath, 0);
+            if (packageInfo == null) {
+                Log.e(TAG, "Failed to get package info for: " + skinPkgPath);
+                return null;
+            }
             packageInfo.applicationInfo.sourceDir = skinPkgPath;
             packageInfo.applicationInfo.publicSourceDir = skinPkgPath;
             Resources res = mAppContext.getPackageManager().getResourcesForApplication(packageInfo.applicationInfo);
             Resources superRes = mAppContext.getResources();
-            return new Resources(res.getAssets(), superRes.getDisplayMetrics(), superRes.getConfiguration());
+            return new WeakReference<>(new Resources(res.getAssets(), superRes.getDisplayMetrics(), superRes.getConfiguration())).get();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to load skin resources: " + skinPkgPath, e);
+            return null;
         }
-        return null;
     }
 }
