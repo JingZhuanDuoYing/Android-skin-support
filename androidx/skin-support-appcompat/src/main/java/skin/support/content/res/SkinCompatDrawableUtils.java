@@ -22,21 +22,12 @@ class SkinCompatDrawableUtils {
     }
 
     /**
-     * Some drawable implementations have problems with mutation. This method returns false if
-     * there is a known issue in the given drawable's implementation.
-     */
-    public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
-        // We'll never return false on API level >= 17, stop early.
-        return true;
-    }
-
-    /**
      * VectorDrawable has an issue on API 21 where it sometimes doesn't create its tint filter.
      * Fixed by toggling it's state to force a filter creation.
      */
     private static void fixVectorDrawableTinting(final Drawable drawable) {
         final int[] originalState = drawable.getState();
-        if (originalState == null || originalState.length == 0) {
+        if (originalState.length == 0) {
             // The drawable doesn't have a state, so set it to be checked
             drawable.setState(SkinCompatThemeUtils.CHECKED_STATE_SET);
         } else {

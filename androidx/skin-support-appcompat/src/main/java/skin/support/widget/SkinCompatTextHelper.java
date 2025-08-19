@@ -18,7 +18,6 @@ import skin.support.content.res.SkinCompatVectorResources;
  */
 
 public class SkinCompatTextHelper extends SkinCompatHelper {
-    private static final String TAG = SkinCompatTextHelper.class.getSimpleName();
 
     public static SkinCompatTextHelper create(TextView textView) {
         return new SkinCompatTextHelperV17(textView);

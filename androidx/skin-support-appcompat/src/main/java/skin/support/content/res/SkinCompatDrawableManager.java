@@ -21,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.graphics.drawable.AnimatedStateListDrawableCompat;
-import androidx.appcompat.widget.ThemeUtils;
 import androidx.appcompat.widget.TintInfo;
 import androidx.collection.ArrayMap;
 import androidx.collection.LongSparseArray;
@@ -37,7 +36,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import static androidx.appcompat.content.res.AppCompatResources.getColorStateList;
 import static androidx.core.graphics.ColorUtils.compositeColors;
 import static skin.support.content.res.SkinCompatThemeUtils.getDisabledThemeAttrColor;
 import static skin.support.content.res.SkinCompatThemeUtils.getThemeAttrColor;
@@ -248,9 +246,7 @@ final class SkinCompatDrawableManager {
         final ColorStateList tintList = getTintList(context, resId);
         if (tintList != null) {
             // First mutate the Drawable, then wrap it and set the tint list
-            if (SkinCompatDrawableUtils.canSafelyMutateDrawable(drawable)) {
-                drawable = drawable.mutate();
-            }
+            drawable = drawable.mutate();
             drawable = DrawableCompat.wrap(drawable);
             DrawableCompat.setTintList(drawable, tintList);
 
@@ -437,9 +433,7 @@ final class SkinCompatDrawableManager {
         }
 
         if (colorAttrSet) {
-            if (SkinCompatDrawableUtils.canSafelyMutateDrawable(drawable)) {
-                drawable = drawable.mutate();
-            }
+            drawable = drawable.mutate();
 
             final int color = getThemeAttrColor(context, colorAttr);
             drawable.setColorFilter(getPorterDuffColorFilter(color, tintMode));
@@ -670,8 +664,7 @@ final class SkinCompatDrawableManager {
     }
 
     static void tintDrawable(Drawable drawable, TintInfo tint, int[] state) {
-        if (SkinCompatDrawableUtils.canSafelyMutateDrawable(drawable)
-                && drawable.mutate() != drawable) {
+        if (drawable.mutate() != drawable) {
             Log.d(TAG, "Mutated drawable is not the same instance as the input.");
             return;
         }
@@ -716,9 +709,7 @@ final class SkinCompatDrawableManager {
     }
 
     private static void setPorterDuffColorFilter(Drawable d, int color, PorterDuff.Mode mode) {
-        if (SkinCompatDrawableUtils.canSafelyMutateDrawable(d)) {
-            d = d.mutate();
-        }
+        d = d.mutate();
         d.setColorFilter(getPorterDuffColorFilter(color, mode == null ? DEFAULT_MODE : mode));
     }
 
