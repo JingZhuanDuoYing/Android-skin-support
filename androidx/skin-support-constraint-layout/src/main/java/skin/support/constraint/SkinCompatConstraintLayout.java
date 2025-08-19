@@ -3,6 +3,7 @@ package skin.support.constraint;
 import android.content.Context;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import skin.support.widget.SkinCompatBackgroundHelper;
 import skin.support.widget.SkinCompatSupportable;
@@ -12,6 +13,7 @@ import skin.support.widget.SkinCompatSupportable;
  */
 
 public class SkinCompatConstraintLayout extends ConstraintLayout implements SkinCompatSupportable {
+    private static final String TAG = "SkinCompatConstraint";
     private final SkinCompatBackgroundHelper mBackgroundTintHelper;
 
     public SkinCompatConstraintLayout(Context context) {
@@ -25,7 +27,11 @@ public class SkinCompatConstraintLayout extends ConstraintLayout implements Skin
     public SkinCompatConstraintLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mBackgroundTintHelper = new SkinCompatBackgroundHelper(this);
-        mBackgroundTintHelper.loadFromAttributes(attrs, defStyleAttr);
+        try {
+            mBackgroundTintHelper.loadFromAttributes(attrs, defStyleAttr);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to load background attributes", e);
+        }
     }
 
     @Override

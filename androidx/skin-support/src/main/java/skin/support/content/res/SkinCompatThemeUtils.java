@@ -4,18 +4,24 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.util.Log;
 import android.util.TypedValue;
 
 import skin.support.graphics.ColorUtils;
 
 import static skin.support.widget.SkinCompatHelper.INVALID_ID;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
- * Created by ximsfei on 2017/3/25.
+ * 工具类，用于从 Android 主题中获取换肤相关的资源（如颜色、ColorStateList）。
+ *
+ * @author ximsfei
+ * @since 2017/3/25
  */
-
 public class SkinCompatThemeUtils {
-
+    private static final String TAG = "SkinCompatThemeUtils";
     private static final ThreadLocal<TypedValue> TL_TYPED_VALUE = new ThreadLocal<>();
 
     static final int[] DISABLED_STATE_SET = new int[]{-android.R.attr.state_enabled};
@@ -36,22 +42,55 @@ public class SkinCompatThemeUtils {
 
     private static final int[] TEMP_ARRAY = new int[1];
 
-    public static int getTextColorPrimaryResId(Context context) {
+    /**
+     * 获取主题中的主文本颜色资源 ID。
+     *
+     * @param context 上下文
+     * @return 主文本颜色资源 ID，若未找到返回 {@link SkinCompatHelper#INVALID_ID}
+     */
+    public static int getTextColorPrimaryResId(@NonNull Context context) {
         return getResId(context, new int[]{android.R.attr.textColorPrimary});
     }
 
-    public static int getWindowBackgroundResId(Context context) {
+    /**
+     * 获取主题中的窗口背景资源 ID。
+     *
+     * @param context 上下文
+     * @return 窗口背景资源 ID，若未找到返回 {@link SkinCompatHelper#INVALID_ID}
+     */
+    public static int getWindowBackgroundResId(@NonNull Context context) {
         return getResId(context, new int[]{android.R.attr.windowBackground});
     }
 
-    static int getResId(Context context, int[] attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs);
-        final int resId = a.getResourceId(0, INVALID_ID);
-        a.recycle();
-        return resId;
+    /**
+     * 从主题中获取指定属性的资源 ID。
+     *
+     * @param context 上下文
+     * @param attrs   属性数组
+     * @return 资源 ID，若未找到返回 {@link SkinCompatHelper#INVALID_ID}
+     */
+    static int getResId(@NonNull Context context, @NonNull int[] attrs) {
+        try {
+            TypedArray a = context.obtainStyledAttributes(attrs);
+            try {
+                return a.getResourceId(0, INVALID_ID);
+            } finally {
+                a.recycle();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get resource ID for attributes: " + attrs, e);
+            return INVALID_ID;
+        }
     }
 
-    public static int getThemeAttrColor(Context context, int attr) {
+    /**
+     * 从主题中获取指定属性的颜色值。
+     *
+     * @param context 上下文
+     * @param attr    属性 ID
+     * @return 颜色值，若未找到返回 0
+     */
+    public static int getThemeAttrColor(@NonNull Context context, int attr) {
         TEMP_ARRAY[0] = attr;
         TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, null, TEMP_ARRAY);
         try {
@@ -61,7 +100,15 @@ public class SkinCompatThemeUtils {
         }
     }
 
-    public static ColorStateList getThemeAttrColorStateList(Context context, int attr) {
+    /**
+     * 从主题中获取指定属性的 ColorStateList。
+     *
+     * @param context 上下文
+     * @param attr    属性 ID
+     * @return ColorStateList，若未找到返回 null
+     */
+    @Nullable
+    public static ColorStateList getThemeAttrColorStateList(@NonNull Context context, int attr) {
         TEMP_ARRAY[0] = attr;
         TypedArray a = context.obtainStyledAttributes(null, TEMP_ARRAY);
         try {
@@ -75,8 +122,15 @@ public class SkinCompatThemeUtils {
         }
     }
 
-    public static int getDisabledThemeAttrColor(Context context, int attr) {
-        final ColorStateList csl = getThemeAttrColorStateList(context, attr);
+    /**
+     * 获取主题中指定属性的禁用状态颜色。
+     *
+     * @param context 上下文
+     * @param attr    属性 ID
+     * @return 禁用状态颜色值，若未找到返回默认颜色
+     */
+    public static int getDisabledThemeAttrColor(@NonNull Context context, int attr) {
+        ColorStateList csl = getThemeAttrColorStateList(context, attr);
         if (csl != null && csl.isStateful()) {
             // If the CSL is stateful, we'll assume it has a disabled state and use it
             return csl.getColorForState(DISABLED_STATE_SET, csl.getDefaultColor());
