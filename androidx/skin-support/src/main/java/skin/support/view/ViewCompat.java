@@ -1,6 +1,5 @@
 package skin.support.view;
 
-import android.os.Build;
 import android.view.View;
 
 public class ViewCompat {
