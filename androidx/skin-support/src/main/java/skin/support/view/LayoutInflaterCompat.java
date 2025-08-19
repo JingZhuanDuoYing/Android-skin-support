@@ -1,11 +1,12 @@
 package skin.support.view;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Field;
 
@@ -15,7 +16,6 @@ public final class LayoutInflaterCompat {
     private static Field sLayoutInflaterFactory2Field;
     private static boolean sCheckedField;
 
-    @SuppressWarnings("deprecation")
     static class Factory2Wrapper implements LayoutInflater.Factory2 {
         final LayoutInflaterFactory mDelegateFactory;
 
@@ -30,12 +30,12 @@ public final class LayoutInflaterCompat {
 
         @Override
         public View onCreateView(View parent, String name, Context context,
-                                 AttributeSet attributeSet) {
+                AttributeSet attributeSet) {
             return mDelegateFactory.onCreateView(parent, name, context, attributeSet);
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return getClass().getName() + "{" + mDelegateFactory + "}";
         }
     }
@@ -46,6 +46,7 @@ public final class LayoutInflaterCompat {
      * that already had a Factory2 registered. We work around that bug here. If we can't we
      * log an error.
      */
+    @SuppressWarnings("JavaReflectionMemberAccess")
     private static void forceSetFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
         if (!sCheckedField) {
             try {
@@ -80,29 +81,14 @@ public final class LayoutInflaterCompat {
      * after setting, you can not change the factory.
      *
      * @see LayoutInflater#setFactory(android.view.LayoutInflater.Factory)
+     *
      * @deprecated Use {@link #setFactory2(LayoutInflater, LayoutInflater.Factory2)} instead to set
      * and {@link LayoutInflater#getFactory2()} to get the factory.
      */
     @Deprecated
     public static void setFactory(
-            LayoutInflater inflater, LayoutInflaterFactory factory) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            inflater.setFactory2(factory != null ? new LayoutInflaterCompat.Factory2Wrapper(factory) : null);
-        } else {
-            final LayoutInflater.Factory2 factory2 = factory != null
-                    ? new LayoutInflaterCompat.Factory2Wrapper(factory) : null;
-            inflater.setFactory2(factory2);
-
-            final LayoutInflater.Factory f = inflater.getFactory();
-            if (f instanceof LayoutInflater.Factory2) {
-                // The merged factory is now set to getFactory(), but not getFactory2() (pre-v21).
-                // We will now try and force set the merged factory to mFactory2
-                forceSetFactory2(inflater, (LayoutInflater.Factory2) f);
-            } else {
-                // Else, we will force set the original wrapped Factory2
-                forceSetFactory2(inflater, factory2);
-            }
-        }
+            @NonNull LayoutInflater inflater, @NonNull LayoutInflaterFactory factory) {
+        inflater.setFactory2(new Factory2Wrapper(factory));
     }
 
     /**
@@ -113,7 +99,7 @@ public final class LayoutInflaterCompat {
      * @see LayoutInflater#setFactory2(android.view.LayoutInflater.Factory2)
      */
     public static void setFactory2(
-            LayoutInflater inflater, LayoutInflater.Factory2 factory) {
+            @NonNull LayoutInflater inflater, LayoutInflater.@NonNull Factory2 factory) {
         inflater.setFactory2(factory);
     }
 
@@ -126,6 +112,7 @@ public final class LayoutInflaterCompat {
      * {@link LayoutInflater}. Will be {@code null} if the inflater does not
      * have a {@link LayoutInflaterFactory} but a raw {@link LayoutInflater.Factory}.
      * @see LayoutInflater#getFactory()
+     *
      * @deprecated Use {@link #setFactory2(LayoutInflater, LayoutInflater.Factory2)} to set and
      * {@link LayoutInflater#getFactory2()} to get the factory.
      */
