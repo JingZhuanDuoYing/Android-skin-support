@@ -1,29 +1,36 @@
 package skin.support.observe;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by ximsfei on 2017/1/10.
  */
-
 public class SkinObservable {
-    private final ArrayList<SkinObserver> observers;
+    private final List<SkinObserver> mObservers;
 
     public SkinObservable() {
-        observers = new ArrayList<>();
+        mObservers = new ArrayList<>();
     }
 
+    /**
+     * Adds an observer to the set of observers for this object, provided
+     * that it is not the same as some observer already in the set.
+     * The order in which notifications will be delivered to observers is not specified.
+     *
+     * @param o an observer to be added.
+     * @throws NullPointerException if the parameter o is null.
+     */
     public synchronized void addObserver(SkinObserver o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (!observers.contains(o)) {
-            observers.add(o);
+        Objects.requireNonNull(o, "observer == null");
+        if (!mObservers.contains(o)) {
+            mObservers.add(o);
         }
     }
 
     public synchronized void deleteObserver(SkinObserver o) {
-        observers.remove(o);
+        mObservers.remove(o);
     }
 
     public void notifyUpdateSkin() {
@@ -31,26 +38,26 @@ public class SkinObservable {
     }
 
     public void notifyUpdateSkin(Object arg) {
-        SkinObserver[] arrLocal;
+        SkinObserver[] localObservers;
 
         synchronized (this) {
-            arrLocal = observers.toArray(new SkinObserver[observers.size()]);
+            localObservers = mObservers.toArray(new SkinObserver[0]);
         }
 
-        for (int i = arrLocal.length-1; i>=0; i--) {
+        for (int i = localObservers.length - 1; i >= 0; i--) {
             try {
-                arrLocal[i].updateSkin(this, arg);
-            } catch(Exception e) {
-                e.printStackTrace();
+                localObservers[i].updateSkin(this, arg);
+            } catch (Exception e) {
+                // Ignore exceptions thrown by observers
             }
         }
     }
 
     public synchronized void deleteObservers() {
-        observers.clear();
+        mObservers.clear();
     }
 
     public synchronized int countObservers() {
-        return observers.size();
+        return mObservers.size();
     }
 }
