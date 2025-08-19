@@ -7,6 +7,7 @@ import android.view.View;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,10 +82,15 @@ public class SkinCompatDelegate implements LayoutInflater.Factory2 {
         if (mSkinHelpers.isEmpty()) {
             return;
         }
-        for (WeakReference<SkinCompatSupportable> ref : mSkinHelpers) {
+
+        Iterator<WeakReference<SkinCompatSupportable>> it = mSkinHelpers.iterator();
+        while (it.hasNext()) {
+            WeakReference<SkinCompatSupportable> ref = it.next();
             SkinCompatSupportable helper = ref.get();
             if (helper != null) {
                 helper.applySkin();
+            } else {
+                it.remove(); // 清理掉已经被 GC 的引用
             }
         }
     }
