@@ -44,11 +44,7 @@ public class SkinCompatViewInflater {
 
     @Nullable
     public final View createView(View parent, final String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-        View view = createViewFromHackInflater(context, name, attrs);
-
-        if (view == null) {
-            view = createViewFromInflater(context, name, attrs);
-        }
+        View view = createViewFromInflater(context, name, attrs);
 
         if (view == null) {
             view = createViewFromTag(context, name, attrs);
@@ -62,18 +58,6 @@ public class SkinCompatViewInflater {
         return view;
     }
 
-    private View createViewFromHackInflater(Context context, String name, AttributeSet attrs) {
-        View view = null;
-        for (SkinLayoutInflater inflater : SkinCompatManager.getInstance().getHookInflaters()) {
-            view = inflater.createView(context, name, attrs);
-            if (view == null) {
-                continue;
-            } else {
-                break;
-            }
-        }
-        return view;
-    }
 
     private View createViewFromInflater(Context context, String name, AttributeSet attrs) {
         View view = null;
