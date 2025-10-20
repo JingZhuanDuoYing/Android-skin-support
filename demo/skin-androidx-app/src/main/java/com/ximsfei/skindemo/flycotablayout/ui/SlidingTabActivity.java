@@ -18,8 +18,6 @@ import com.ximsfei.skindemo.flycotablayout.utils.ViewFindUtils;
 
 import java.util.ArrayList;
 
-import skin.support.flycotablayout.widget.SkinMsgView;
-
 public class SlidingTabActivity extends FlycoActivity implements OnTabSelectListener {
     private Context mContext = this;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
@@ -82,12 +80,7 @@ public class SlidingTabActivity extends FlycoActivity implements OnTabSelectList
         tabLayout_1.showDot(4);
         MsgView rtv_1_4 = tabLayout_1.getMsgView(4);
         if (rtv_1_4 != null) {
-            if (rtv_1_4 instanceof SkinMsgView) {
-                ((SkinMsgView) rtv_1_4).setBackgroundColorResource(R.color.msg_background_color);
-                ((SkinMsgView) rtv_1_4).setStrokeColorResource(R.color.msg_stroke_color);
-            } else {
-                rtv_1_4.setBackgroundColor(Color.parseColor("#6D8FB0"));
-            }
+            rtv_1_4.setBackgroundColor(Color.parseColor("#6D8FB0"));
         }
         tabLayout_3.showDot(4);
         tabLayout_2.showDot(4);
@@ -96,12 +89,7 @@ public class SlidingTabActivity extends FlycoActivity implements OnTabSelectList
         tabLayout_2.setMsgMargin(3, 0, 10);
         MsgView rtv_2_3 = tabLayout_2.getMsgView(3);
         if (rtv_2_3 != null) {
-            if (rtv_2_3 instanceof SkinMsgView) {
-                ((SkinMsgView) rtv_2_3).setBackgroundColorResource(R.color.msg_background_color);
-                ((SkinMsgView) rtv_2_3).setStrokeColorResource(R.color.msg_stroke_color);
-            } else {
-                rtv_2_3.setBackgroundColor(Color.parseColor("#6D8FB0"));
-            }
+            rtv_2_3.setBackgroundColor(Color.parseColor("#6D8FB0"));
         }
 
         tabLayout_2.showMsg(5, 5);
