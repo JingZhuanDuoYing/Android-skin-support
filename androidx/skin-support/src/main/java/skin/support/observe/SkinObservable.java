@@ -42,6 +42,11 @@ public class SkinObservable {
         }
     }
 
+    public void deleteObserver(@Nullable SkinObserver observer) {
+        removeObserver(observer);
+    }
+
+
     /**
      * Notifies all registered observers of a skin update with no additional data.
      */
@@ -72,8 +77,8 @@ public class SkinObservable {
         }
     }
 
-    public synchronized void deleteObservers() {
-        mObservers.clear();
+    public void deleteObservers() {
+        clearObservers();
     }
 
     /**
