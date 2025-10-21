@@ -17,7 +17,12 @@ import skin.support.annotation.NonNull;
 import skin.support.widget.SkinCompatSupportable;
 
 /**
- * Created by ximsfei on 2017/1/9.
+ * A custom {@link LayoutInflater.Factory2} implementation that manages skinning for views.
+ * It creates views with skin support, tracks {@link SkinCompatSupportable} instances,
+ * and applies skin changes using a thread-safe set of weak references.
+ *
+ * @author ximsfei
+ * @since 2017/1/9
  */
 
 public class SkinCompatDelegate implements LayoutInflater.Factory2 {

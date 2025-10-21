@@ -3,6 +3,7 @@ package skin.support.app;
 import android.content.Context;
 import android.content.res.TypedArray;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.TintContextWrapper;
 import androidx.appcompat.widget.VectorEnabledTintResources;
@@ -35,13 +36,30 @@ import skin.support.widget.SkinCompatTextView;
 import skin.support.widget.SkinCompatToolbar;
 import skin.support.widget.SkinCompatView;
 
-public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrapper {
+/**
+ * A custom view inflater that creates skinnable views and wraps contexts for theme application.
+ * Implements {@link SkinLayoutInflater} for view creation and {@link SkinWrapper} for context wrapping.
+ */
+public final class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrapper {
     private static final String LOG_TAG = "SkinAppCompatViewInflater";
 
+    /**
+     * Constructs a new {@link SkinAppCompatViewInflater} and initializes vector resources.
+     */
     public SkinAppCompatViewInflater() {
         SkinCompatVectorResources.getInstance();
     }
 
+    /**
+     * Creates a view with the specified name and attributes, trying framework views first,
+     * then AppCompat-specific views.
+     *
+     * @param context The context to use for view creation.
+     * @param name    The name of the view to create.
+     * @param attrs   The attribute set for the view.
+     * @return The created view, or null if creation fails.
+     * @throws IllegalArgumentException if context, name, or attrs is null.
+     */
     @Override
     public View createView(Context context, String name, AttributeSet attrs) {
         View view = createViewFromFV(context, name, attrs);
@@ -53,35 +71,33 @@ public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrappe
     }
 
     private View createViewFromFV(Context context, String name, AttributeSet attrs) {
-        View view = null;
         if (name.contains(".")) {
             return null;
         }
-        switch (name) {
-            case "View" -> view = new SkinCompatView(context, attrs);
-            case "LinearLayout" -> view = new SkinCompatLinearLayout(context, attrs);
-            case "RelativeLayout" -> view = new SkinCompatRelativeLayout(context, attrs);
-            case "FrameLayout" -> view = new SkinCompatFrameLayout(context, attrs);
-            case "TextView" -> view = new SkinCompatTextView(context, attrs);
-            case "ImageView" -> view = new SkinCompatImageView(context, attrs);
-            case "Button" -> view = new SkinCompatButton(context, attrs);
-            case "EditText" -> view = new SkinCompatEditText(context, attrs);
-            case "Spinner" -> view = new SkinCompatSpinner(context, attrs);
-            case "ImageButton" -> view = new SkinCompatImageButton(context, attrs);
-            case "CheckBox" -> view = new SkinCompatCheckBox(context, attrs);
-            case "RadioButton" -> view = new SkinCompatRadioButton(context, attrs);
-            case "RadioGroup" -> view = new SkinCompatRadioGroup(context, attrs);
-            case "CheckedTextView" -> view = new SkinCompatCheckedTextView(context, attrs);
-            case "AutoCompleteTextView" -> view = new SkinCompatAutoCompleteTextView(context, attrs);
-            case "MultiAutoCompleteTextView" -> view = new SkinCompatMultiAutoCompleteTextView(context, attrs);
-            case "RatingBar" -> view = new SkinCompatRatingBar(context, attrs);
-            case "SeekBar" -> view = new SkinCompatSeekBar(context, attrs);
-            case "ProgressBar" -> view = new SkinCompatProgressBar(context, attrs);
-            case "ScrollView" -> view = new SkinCompatScrollView(context, attrs);
-            default -> {
-            }
-        }
-        return view;
+
+        return switch (name) {
+            case "View" -> new SkinCompatView(context, attrs);
+            case "LinearLayout" -> new SkinCompatLinearLayout(context, attrs);
+            case "RelativeLayout" -> new SkinCompatRelativeLayout(context, attrs);
+            case "FrameLayout" -> new SkinCompatFrameLayout(context, attrs);
+            case "TextView" -> new SkinCompatTextView(context, attrs);
+            case "ImageView" -> new SkinCompatImageView(context, attrs);
+            case "Button" -> new SkinCompatButton(context, attrs);
+            case "EditText" -> new SkinCompatEditText(context, attrs);
+            case "Spinner" -> new SkinCompatSpinner(context, attrs);
+            case "ImageButton" -> new SkinCompatImageButton(context, attrs);
+            case "CheckBox" -> new SkinCompatCheckBox(context, attrs);
+            case "RadioButton" -> new SkinCompatRadioButton(context, attrs);
+            case "RadioGroup" -> new SkinCompatRadioGroup(context, attrs);
+            case "CheckedTextView" -> new SkinCompatCheckedTextView(context, attrs);
+            case "AutoCompleteTextView" -> new SkinCompatAutoCompleteTextView(context, attrs);
+            case "MultiAutoCompleteTextView" -> new SkinCompatMultiAutoCompleteTextView(context, attrs);
+            case "RatingBar" -> new SkinCompatRatingBar(context, attrs);
+            case "SeekBar" -> new SkinCompatSeekBar(context, attrs);
+            case "ProgressBar" -> new SkinCompatProgressBar(context, attrs);
+            case "ScrollView" -> new SkinCompatScrollView(context, attrs);
+            default -> null;
+        };
     }
 
     private View createViewFromV7(Context context, String name, AttributeSet attrs) {
@@ -94,8 +110,6 @@ public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrappe
 
     @Override
     public Context wrapContext(Context context, View parent, AttributeSet attrs) {
-        final boolean isPre21 = false;
-
         boolean readAppTheme = true; /* Read read app:theme as a fallback at all times for legacy reasons */
         boolean wrapContext = VectorEnabledTintResources.shouldBeUsed(); /* Only tint wrap the context if enabled */
 
@@ -110,30 +124,31 @@ public class SkinAppCompatViewInflater implements SkinLayoutInflater, SkinWrappe
     }
 
     /**
-     * Allows us to emulate the {@code android:theme} attribute for devices before L.
+     * Applies the android:theme attribute to the context, if specified.
+     *
+     * @param context      The original context.
+     * @param attrs        The attribute set containing theme information.
+     * @param useAppTheme  Whether to read the app:theme attribute (for legacy support).
+     * @return The themed context, or the original context if no theme is applied.
      */
-    private static Context themifyContext(Context context, AttributeSet attrs,
+    @NonNull
+    private static Context themifyContext(@NonNull Context context, @NonNull AttributeSet attrs,
                                           boolean useAppTheme) {
-        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.View, 0, 0);
-        int themeId = 0;
-        if (useAppTheme) {
-            // ...if that didn't work, try reading app:theme (for legacy reasons) if enabled
-            themeId = a.getResourceId(R.styleable.View_theme, 0);
-
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.View, 0, 0);
+        try {
+            int themeId = useAppTheme ? typedArray.getResourceId(R.styleable.View_theme, 0) : 0;
             if (themeId != 0) {
-                Slog.i(LOG_TAG, "app:theme is now deprecated. "
-                        + "Please move to using android:theme instead.");
+                if (Slog.DEBUG) {
+                    Slog.i("app:theme is deprecated; use android:theme instead");
+                }
+                if (!(context instanceof ContextThemeWrapper) ||
+                        ((ContextThemeWrapper) context).getThemeResId() != themeId) {
+                    context = new ContextThemeWrapper(context, themeId);
+                }
             }
+            return context;
+        } finally {
+            typedArray.recycle();
         }
-        a.recycle();
-
-        if (themeId != 0 && (!(context instanceof ContextThemeWrapper)
-                || ((ContextThemeWrapper) context).getThemeResId() != themeId)) {
-            // If the context isn't a ContextThemeWrapper, or it is but does not have
-            // the same theme as we need, wrap it in a new wrapper
-            context = new ContextThemeWrapper(context, themeId);
-        }
-        return context;
     }
-
 }
