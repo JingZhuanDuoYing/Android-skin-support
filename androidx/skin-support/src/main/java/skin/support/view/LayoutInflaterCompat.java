@@ -6,20 +6,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import org.jspecify.annotations.NonNull;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import java.lang.reflect.Field;
-
+/**
+ * A utility class to manage custom {@link LayoutInflater.Factory2} instances for view inflation.
+ * This class provides methods to set and retrieve a custom factory for creating views during
+ * inflation, ensuring compatibility with modern Android APIs (21+).
+ */
 public final class LayoutInflaterCompat {
-    private static final String TAG = "LayoutInflaterCompatHC";
+    private static final String TAG = "LayoutInflaterCompat";
 
-    private static Field sLayoutInflaterFactory2Field;
-    private static boolean sCheckedField;
+    /**
+     * Wraps a {@link LayoutInflaterFactory} to implement {@link LayoutInflater.Factory2}.
+     */
+    private static class Factory2Wrapper implements LayoutInflater.Factory2 {
+        private final LayoutInflaterFactory mDelegateFactory;
 
-    static class Factory2Wrapper implements LayoutInflater.Factory2 {
-        final LayoutInflaterFactory mDelegateFactory;
-
-        Factory2Wrapper(LayoutInflaterFactory delegateFactory) {
+        Factory2Wrapper(@NonNull LayoutInflaterFactory delegateFactory) {
             mDelegateFactory = delegateFactory;
         }
 
@@ -29,98 +33,67 @@ public final class LayoutInflaterCompat {
         }
 
         @Override
-        public View onCreateView(View parent, String name, Context context,
-                AttributeSet attributeSet) {
-            return mDelegateFactory.onCreateView(parent, name, context, attributeSet);
+        public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+            return mDelegateFactory.onCreateView(parent, name, context, attrs);
         }
 
         @Override
-        public @NonNull String toString() {
-            return getClass().getName() + "{" + mDelegateFactory + "}";
+        public String toString() {
+            return getClass().getSimpleName() + "{" + mDelegateFactory + "}";
         }
     }
 
     /**
-     * For APIs < 21, there was a framework bug that prevented a LayoutInflater's
-     * Factory2 from being merged properly if set after a cloneInContext from a LayoutInflater
-     * that already had a Factory2 registered. We work around that bug here. If we can't we
-     * log an error.
-     */
-    @SuppressWarnings("JavaReflectionMemberAccess")
-    private static void forceSetFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
-        if (!sCheckedField) {
-            try {
-                sLayoutInflaterFactory2Field = LayoutInflater.class.getDeclaredField("mFactory2");
-                sLayoutInflaterFactory2Field.setAccessible(true);
-            } catch (NoSuchFieldException e) {
-                Log.e(TAG, "forceSetFactory2 Could not find field 'mFactory2' on class "
-                        + LayoutInflater.class.getName()
-                        + "; inflation may have unexpected results.", e);
-            }
-            sCheckedField = true;
-        }
-        if (sLayoutInflaterFactory2Field != null) {
-            try {
-                sLayoutInflaterFactory2Field.set(inflater, factory);
-            } catch (IllegalAccessException e) {
-                Log.e(TAG, "forceSetFactory2 could not set the Factory2 on LayoutInflater "
-                        + inflater + "; inflation may have unexpected results.", e);
-            }
-        }
-    }
-
-    /*
-     * Hide the constructor.
+     * Private constructor to prevent instantiation.
      */
     private LayoutInflaterCompat() {
+        // Prevent instantiation
     }
 
     /**
-     * Attach a custom Factory interface for creating views while using
-     * this LayoutInflater. This must not be null, and can only be set once;
-     * after setting, you can not change the factory.
+     * Sets a custom {@link LayoutInflater.Factory2} for creating views during inflation.
+     * This method must be called only once, as subsequent calls may be ignored by the system.
      *
-     * @see LayoutInflater#setFactory(android.view.LayoutInflater.Factory)
-     *
-     * @deprecated Use {@link #setFactory2(LayoutInflater, LayoutInflater.Factory2)} instead to set
-     * and {@link LayoutInflater#getFactory2()} to get the factory.
+     * @param inflater The {@link LayoutInflater} to set the factory on.
+     * @param factory The {@link LayoutInflater.Factory2} to use for view creation.
+     * @throws IllegalArgumentException if inflater or factory is null.
      */
-    @Deprecated
-    public static void setFactory(
-            @NonNull LayoutInflater inflater, @NonNull LayoutInflaterFactory factory) {
-        inflater.setFactory2(new Factory2Wrapper(factory));
-    }
-
-    /**
-     * Attach a custom {@link LayoutInflater.Factory2} for creating views while using
-     * this {@link LayoutInflater}. This must not be null, and can only be set once;
-     * after setting, you can not change the factory.
-     *
-     * @see LayoutInflater#setFactory2(android.view.LayoutInflater.Factory2)
-     */
-    public static void setFactory2(
-            @NonNull LayoutInflater inflater, LayoutInflater.@NonNull Factory2 factory) {
+    public static void setFactory2(@NonNull LayoutInflater inflater, @NonNull LayoutInflater.Factory2 factory) {
+        if (inflater == null || factory == null) {
+            throw new IllegalArgumentException("Inflater and factory must not be null");
+        }
         inflater.setFactory2(factory);
     }
 
     /**
-     * Return the current {@link LayoutInflaterFactory} (or null). This is
-     * called on each element name. If the factory returns a View, add that
-     * to the hierarchy. If it returns null, proceed to call onCreateView(name).
+     * Sets a custom {@link LayoutInflaterFactory} for creating views during inflation.
+     * This method wraps the provided factory into a {@link LayoutInflater.Factory2} implementation.
      *
-     * @return The {@link LayoutInflaterFactory} associated with the
-     * {@link LayoutInflater}. Will be {@code null} if the inflater does not
-     * have a {@link LayoutInflaterFactory} but a raw {@link LayoutInflater.Factory}.
-     * @see LayoutInflater#getFactory()
-     *
-     * @deprecated Use {@link #setFactory2(LayoutInflater, LayoutInflater.Factory2)} to set and
-     * {@link LayoutInflater#getFactory2()} to get the factory.
+     * @param inflater The {@link LayoutInflater} to set the factory on.
+     * @param factory The {@link LayoutInflaterFactory} to use for view creation.
+     * @throws IllegalArgumentException if inflater or factory is null.
      */
-    @Deprecated
-    public static LayoutInflaterFactory getFactory(LayoutInflater inflater) {
+    public static void setFactory(@NonNull LayoutInflater inflater, @NonNull LayoutInflaterFactory factory) {
+        if (inflater == null || factory == null) {
+            throw new IllegalArgumentException("Inflater and factory must not be null");
+        }
+        setFactory2(inflater, new Factory2Wrapper(factory));
+    }
+
+    /**
+     * Retrieves the {@link LayoutInflaterFactory} associated with the given {@link LayoutInflater}.
+     *
+     * @param inflater The {@link LayoutInflater} to query.
+     * @return The {@link LayoutInflaterFactory} if set and wrapped, or null otherwise.
+     */
+    @Nullable
+    public static LayoutInflaterFactory getFactory(@NonNull LayoutInflater inflater) {
+        if (inflater == null) {
+            return null;
+        }
         LayoutInflater.Factory factory = inflater.getFactory();
-        if (factory instanceof LayoutInflaterCompat.Factory2Wrapper) {
-            return ((LayoutInflaterCompat.Factory2Wrapper) factory).mDelegateFactory;
+        if (factory instanceof Factory2Wrapper) {
+            return ((Factory2Wrapper) factory).mDelegateFactory;
         }
         return null;
     }
