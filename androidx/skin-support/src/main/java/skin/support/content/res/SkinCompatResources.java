@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import skin.support.SkinCompatManager;
@@ -27,7 +28,7 @@ public class SkinCompatResources {
     private String mSkinName = "";
     private SkinCompatManager.SkinLoaderStrategy mStrategy;
     private boolean isDefaultSkin = true;
-    private List<SkinResources> mSkinResources = new ArrayList<>();
+    private final List<SkinResources> mSkinResources = Collections.synchronizedList(new ArrayList<>());
 
     private LruCache<String, Integer> skinResIdCache = null;
 
@@ -76,8 +77,10 @@ public class SkinCompatResources {
         mStrategy = strategy;
         isDefaultSkin = false;
         SkinCompatUserThemeManager.get().clearCaches();
-        for (SkinResources skinResources : mSkinResources) {
-            skinResources.clear();
+        synchronized (mSkinResources) {
+            for (SkinResources skinResources : mSkinResources) {
+                skinResources.clear();
+            }
         }
     }
 
@@ -85,14 +88,29 @@ public class SkinCompatResources {
         return mResources;
     }
 
+    /**
+     * Gets the current skin package name.
+     *
+     * @return The skin package name, or empty if default skin is active.
+     */
     public String getSkinPkgName() {
         return mSkinPkgName;
     }
 
+    /**
+     * Gets the current skin loading strategy.
+     *
+     * @return The active {@link SkinCompatManager.SkinLoaderStrategy}, or null if none.
+     */
     public SkinCompatManager.SkinLoaderStrategy getStrategy() {
         return mStrategy;
     }
 
+    /**
+     * Checks if the default skin is active.
+     *
+     * @return True if using the default skin, false otherwise.
+     */
     public boolean isDefaultSkin() {
         return isDefaultSkin;
     }
@@ -112,6 +130,13 @@ public class SkinCompatResources {
         return getColorStateList(SkinCompatManager.getInstance().getContext(), resId);
     }
 
+    /**
+     * Retrieves the target resource ID for the given application resource ID.
+     *
+     * @param context The {@link Context} to access resources.
+     * @param resId   The application resource ID.
+     * @return The corresponding skin resource ID, or 0 if not found.
+     */
     public int getTargetResId(Context context, int resId) {
         String cacheKey = mSkinName + resId;
         Integer cacheValue = null;
@@ -142,19 +167,31 @@ public class SkinCompatResources {
         }
     }
 
-    private int getSkinColor(Context context, int resId) {
+    /**
+     * Gets a color for the given resource ID, applying skin theming if active.
+     *
+     * @param context The {@link Context} to access resources.
+     * @param resId   The resource ID.
+     * @return The color value.
+     */
+    public int getSkinColor(Context context, @AnyRes int resId) {
+        // Check user-defined theme colors
         if (!SkinCompatUserThemeManager.get().isColorEmpty()) {
             ColorStateList colorStateList = SkinCompatUserThemeManager.get().getColorStateList(resId);
             if (colorStateList != null) {
                 return colorStateList.getDefaultColor();
             }
         }
+
+        // Check strategy-defined colors
         if (mStrategy != null) {
             ColorStateList colorStateList = mStrategy.getColor(context, mSkinName, resId);
             if (colorStateList != null) {
                 return colorStateList.getDefaultColor();
             }
         }
+
+        // Use skin resources if not default skin
         if (!isDefaultSkin) {
             int targetResId = getTargetResId(context, resId);
             if (targetResId != 0) {
