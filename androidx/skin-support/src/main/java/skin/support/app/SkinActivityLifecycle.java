@@ -93,7 +93,7 @@ public class SkinActivityLifecycle implements Application.ActivityLifecycleCallb
     @Override
     public void onActivityDestroyed(Activity activity) {
         if (isContextSkinEnable(activity)) {
-            SkinCompatManager.getInstance().deleteObserver(getObserver(activity));
+            SkinCompatManager.getInstance().removeObserver(getObserver(activity));
             mSkinObserverMap.remove(activity);
             mSkinDelegateMap.remove(activity);
         }
